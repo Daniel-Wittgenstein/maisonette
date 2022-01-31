@@ -47,11 +47,9 @@ const log_info_for_story_creator = true //should be true in deployment. can be t
 const DEBUG = true
 const projects_path = './app/projects'
 const extension = ".zzz"
-const { reject } = require('async')
-const { triggerAsyncId } = require('async_hooks')
+
 //#######
 const fs = require('fs')
-const { resolve } = require('path')
 let chosen_dir = false
 let file_watcher = false
 let loaded_story_files = []
