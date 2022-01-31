@@ -3,9 +3,6 @@
 /* 
 todo to do:
 
-- if run has no content, it wrongly transpiles to one line too much
-
-- add comment type
 
 - cache entries must expire
 by timestamp, otherwise cache
@@ -25,7 +22,7 @@ by a dedicated engine.
 
 -----------
 
-BLOCK TYPES.
+BLOCK TYPES:
 Keywords have a block type. These are the block types:
 
 - quad blocks: may consist of up to 4 sub-blocks (hence the name)
@@ -147,9 +144,7 @@ maisonette_transpiler = (function() {
                 //we do not auto-create globals anymore.
                 //instead the world_manager creates them
                 //once it is instructed by the io-manager
-                //to do so
-                //text = text.replace("#", "").replace("var ", "")+"; "
-                //return text
+                //to do so.
                 return ""
             }
         },
@@ -206,42 +201,6 @@ maisonette_transpiler = (function() {
 
     }
 
-    /*
-
-    function get_asset_data_obj(lines, rest, type) {
-        let src
-        let id 
-        let line = rest
-        let html
-        let parts = line.split(" ").map(n => n.trim()).filter(n => n) 
-        let ext
-        if (type === "image") ext = "jpg"
-        if (type === "audio") ext = "mp3"
-        if (type === "video") ext = "mp4"
-        if (parts.length !== 2) {
-            return {
-                error: true,
-                msg: `I was expecting a line with this structure: #${type} castle castle.${ext}`,
-            }
-        }
-        id = parts[0]
-        src = parts[1]
-        if (type === "image") {
-            html = `<img class="maisonette-asset" src="${src}">`
-        } else if(type === "audio") {
-            html = `<audio class="maisonette-asset" src="${src}">`            
-        } else if(type === "video") {
-            html = `<video class="maisonette-asset" src="${src}">`
-        }
-        return {
-            id: type + "." + id,
-            asset: true,
-            type: type,
-            org_line: line,
-            html: html,
-        }
-    }
-    */
 
     function create_comparison_hash_from_block(block) {
         //takes block (list of line objects) and
@@ -250,6 +209,7 @@ maisonette_transpiler = (function() {
         //block has already been transpiled. if yes,
         //the transpiled block is fetched from the cache,
         //instead of re-transpiling it.
+        //currently cache is not used
         let sep = "§"
         return block.map(n => n.line+"§"+n.line_nr).join("§§")
     }
@@ -337,7 +297,6 @@ maisonette_transpiler = (function() {
                         result = transpile_block(xinfo, block, very_first)
 
                         cache_ops.retranspiled.push(block[0])
-                        //console.log("retrans")
                     }
                 }
             }
@@ -370,7 +329,6 @@ maisonette_transpiler = (function() {
                 collected_data.push(result.data)
             }
 
-            //console.log(">>>", result, result.text)
             out += result.text
         }
         out = out.replaceAll("§", "")
@@ -390,7 +348,6 @@ maisonette_transpiler = (function() {
 
     function split_into_blocks(str, special_char = "#") {
         /* splits string into blocks */
-        //to do: save index
         let lines = str.split("\n")
         let blocks = []
         blocks.push([])
@@ -411,7 +368,7 @@ maisonette_transpiler = (function() {
     }
 
     function clone(c) {
-        //flat clone, no deep clone
+        //flat clone, not deep clone (obviously)
         return JSON.parse(JSON.stringify(c))
     }
 
@@ -424,7 +381,7 @@ maisonette_transpiler = (function() {
             // block starts with an #
             // this content is just entirely ignored.
             // you can use it to comment your source,
-            // but it's not included in final
+            // but it's not included in the final
             // transpiled output, it will just consist
             // of empty lines
             let out = ""
@@ -679,12 +636,10 @@ maisonette_transpiler = (function() {
     block_command.simplex = (xinfo, lines, rest, first_word, transpiled_key,
         name_of_command, first_line_whole) => {
         //currently only the simplex block supports returning additional meta-data
-        //in addition to the transpiled code that will be returned
+        //in addition to the transpiled code that will be returned.
         //this is used for story meta-data and asset management, where we need
         //to know data BEFORE the JS is run (to inject it into the html file)
         let org = rest
-
-//        console.log("", name_of_command)
 
         let act_command = block_definitions[name_of_command]
 
@@ -710,7 +665,7 @@ maisonette_transpiler = (function() {
         let le_line_nr = lines[0].line_nr
         let le_org_txt = first_line_whole.replaceAll("'", "") //is for error
             //showing only, so we can remove
-            //the apostrophe's entirely
+            //the apostrophes entirely
         
         rest = convert_backticks_to_html(rest)
 
@@ -728,8 +683,6 @@ maisonette_transpiler = (function() {
             index ++
             out2 += "\n"
             out2 += line.line
-            //if (index !== lines.length - 1) {
-            //}
         }
         out2 = convert_backticks_to_html(out2)
 
@@ -850,8 +803,9 @@ maisonette_transpiler = (function() {
 
         rest = convert_backticks_to_html(rest)
         let le_line_nr = lines[0].line_nr
-        let le_org_txt = first_line_whole.replaceAll("'", "") //is for error showing only, so we can remove
-            //the apostrophe's entirely
+        let le_org_txt = first_line_whole.replaceAll("'", "") //is for error
+            //showing only, so we can remove
+            //the apostrophes entirely
 
         let out = `${NAMESPACE}.${transpiled_key}( '${xinfo.file_path}', ${le_line_nr} , '${le_org_txt}',  \`${rest}\`, {\n`
         let index = -1
@@ -877,8 +831,6 @@ maisonette_transpiler = (function() {
         let gather = split_quad_into_blocks(lines, rest)
 
         if (gather.error) return gather
-
-        //console.log("gather", gather)
 
         let tot_items = 0
         for (let key of Object.keys(gather)) {
@@ -966,7 +918,7 @@ maisonette_transpiler = (function() {
 
         let le_org_txt = first_line_whole.replaceAll("'", "") //is for error showing
             //only, so we can remove
-            //the apostrophe's entirely
+            //the apostrophes entirely
 
         let instr = {
             //leave strings single-line:
@@ -1237,6 +1189,9 @@ maisonette_transpiler = (function() {
                 wrong_syntax_code: code_as_string,
                 error_obj: syntax_error, //this is not really useful,
                     //it's just a meh string, not a real error object.
+                    //but later "run.js" performs some magic
+                    //to actually fetch the line number of a
+                    //syntax error (see there)
                 js_syntax_error: true,
             }
         }
