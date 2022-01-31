@@ -1204,20 +1204,3 @@ function click_debug() {
     win.showDevTools(elxx)
 }
 
-
-
-/*
-var splashScreen = win.open('path/to/splash.html', {
-                "transparent": true,
-                'frame': false,
-                "icon": "path/to/icon.png",
-                'position': 'center',
-                'always-on-top': true,
-                "width": 475,
-                "height": 250,
-                "resizable": false,
-                "toolbar": false,
-                "fullscreen": false
-            });
-*/
-
