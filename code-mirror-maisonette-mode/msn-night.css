@@ -1,0 +1,28 @@
+/*
+
+    Name:       msnnight
+
+
+*/
+
+
+
+.cm-s-msnnight span.cm-block_command {color: #0E0;}
+
+.cm-s-msnnight span.cm-sub_block_command {color: #EE0;}
+
+.cm-s-msnnight span.cm-illegal {color: #900;}
+
+.cm-s-msnnight span.cm-asset {color: #D0D;}
+
+.cm-s-msnnight span.cm-meta {color: #0EE;}
+
+.cm-s-msnnight span.cm-block_comment {color: #CCC;}
+
+
+.cm-s-msnnight.CodeMirror {background: #222; color: #eee;}
+.cm-s-msnnight div.CodeMirror-selected {background: #36312e !important;}
+.cm-s-msnnight .CodeMirror-gutters {background: #28211c; border-right: 0px;}
+.cm-s-msnnight .CodeMirror-linenumber {color: #666666;}
+.cm-s-msnnight .CodeMirror-cursor {border-left: 1px solid #797977 !important;}
+

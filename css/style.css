@@ -1,0 +1,239 @@
+
+
+.editor-error-line {
+    /* for showing errors inside codemirror! */
+    border: 2px solid #e00;
+}
+
+#dev-console {
+    position: absolute;
+    display: none;
+    left: 50vw;
+    top: 0px;
+    width: 50vw;
+    height: calc(100vh - 70px);
+    z-index: 1000000;
+    overflow: auto;
+    background: var(--bg_col);
+    color: var(--fg_col);
+    font-family: monospace;
+    padding: 10px;
+}
+
+
+:root {
+    /* The initial values here do not matter at all,
+    the variables are set by JS anyway. */
+    --text_size: 14px;
+    --bg_col: #222;
+    --bg_col_empty_iframe: #333;
+    --disabled_button_bg: #777;
+    --disabled_button_fg: #aaa;
+    --error_table_bg: #aa0;
+    --error_table_fg: #000;
+    --button_bg: #3498db;
+    --button_fg: #fff;
+    --button_bg_hover: #175782;
+    --select_bg: #333;
+    --select_fg: #FFF;
+    --button_border: 1px;
+    --window_border: #CCC;
+    --window_bg: #000;
+    --project_entry_bg: #000;
+    --project_entry_border: #000;
+    --window_close_button_bg: #000;
+    --window_close_button_fg: #000;
+    --window_close_button_bg_highlighted: #000;
+    --window_close_button_fg_highlighted: #000;
+    --input_bg: #000;
+    --input_fg: #000;
+    --border_col: #000;
+}
+
+
+input[type="text"] {
+    background: var(--input_bg);
+    color: var(--input_fg);
+    border: 1px solid var(--border_col);
+    border-radius: 4px;
+    font-size: var(--text-size);
+}
+
+input[type="text"].invalid {
+    color: #D00;
+}
+
+
+
+
+.forbidden-project {
+    border: 2px solid #D00;
+}
+
+select {
+    background-color: var(--select_bg);
+    color: var(--select_fg);
+    font-size: var(--text_size);
+    max-width: 120px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-size: var(--text_size);
+    background-color: var(--bg_col);
+}
+
+
+.wrapper {
+    display: flex;
+    flex-direction: column-reverse;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+}
+
+.xbar {
+    padding: 0px;
+    height: 70px;
+    overflow: hidden;
+    border-top: 1px solid #CCC;
+}
+
+
+#myfile {
+    display: none;
+}
+
+.main-box {
+    background-color: var(--bg_col);
+    height: calc(100vh - 70px);
+    display: flex;
+    flex-direction: row; /* or row-reverse to swap left and right column */
+}
+
+#main-box-column-editor {
+    width: 50vw;
+    height: 100%;
+}
+
+
+#main-box-column-preview {
+    background-color: var(--bg_col);
+    width: 50vw;
+    overflow-y: auto;
+}
+
+.preview {
+    width: 100%;
+    height: 100%;
+    border:  1px solid var(--bg_col_empty_iframe);
+}
+
+#preview-iframe {
+    border: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg_col_empty_iframe);
+}
+
+.my-button {
+    background: var(--button_bg);
+    color: var(--button_fg);
+    border: var(--button_border) solid var(--button_fg);
+    font-family: sans-serif;
+    font-size: var(--text_size);
+    padding: 10px;
+    margin: 6px;
+    cursor: pointer;
+}
+
+.my-button:hover {
+    background: var(--button_bg_hover);
+    color: var(--button_fg_hover);
+}
+
+
+.my-button-disabled {
+    background: var(--disabled_button_bg);
+    color: var(--disabled_button_fg);
+    opacity: 0.4;
+}
+
+.my-button-disabled:hover {
+    background: var(--disabled_button_bg);
+    color: var(--disabled_button_bg);
+    cursor: auto;
+}
+
+.dev-box {
+    padding: 8px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    color: var(--fg_col);
+    z-index: 200000;
+    width: 100vw;
+    height: 100vh;
+    overflow: auto;
+    background: var(--bg_col);
+}
+
+#transpile-show-table {
+    background: var(--bg_col);
+    color: var(--fg_col);
+    border: 1px solid var(--fg_col);
+    border-collapse: collapse;
+    font-size: var(--text_size);
+    font-family: monospace;
+}
+
+th {
+    border: 1px solid var(--fg_col);;
+}
+
+td {
+    border: 1px solid var(--fg_col);;
+    padding: 4px;
+}
+
+.error-box {
+    z-index: 10000;
+    background: var(--bg_col);
+    color: var(--fg_col);
+    padding: 10px;
+    width: 100vw;
+    overflow: auto;
+    font-family: sans-serif;
+    border: 0px solid #D00;
+    width: 100%;
+}
+
+.error-text-code-show {
+    font-family: monospace;
+    font-size: var(--text_size);
+    line-height: 10px;
+    border: 1px solid var(--fg_col);
+    padding: 10px;
+}
+
+
+
+.error-text-code-show-highlighted {
+    background: var(--error_table_bg);
+    color: var(--error_table_fg);
+    padding: 12px;
+}
+
+
+a {
+    color: var(--fg_col);
+}

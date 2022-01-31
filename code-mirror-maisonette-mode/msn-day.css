@@ -1,0 +1,28 @@
+/*
+
+    Name:       msnday
+
+
+*/
+
+
+
+.cm-s-msnday span.cm-block_command {color: #01a252;}
+
+.cm-s-msnday span.cm-sub_block_command {color: #01a0e4;}
+
+.cm-s-msnday span.cm-illegal {color: #F00;}
+
+.cm-s-msnday span.cm-asset {color: #a16a94;}
+
+.cm-s-msnday span.cm-meta {color: #807d7c;}
+
+.cm-s-msnday span.cm-block_comment {color: #555;}
+
+
+.cm-s-msnday.CodeMirror {background: #f7f7f7; color: #3a3432;}
+.cm-s-msnday div.CodeMirror-selected {background: #CCF !important;}
+.cm-s-msnday .CodeMirror-gutters {background: #CCC; border-right: 0px;}
+.cm-s-msnday .CodeMirror-linenumber {color: #444;}
+.cm-s-msnday .CodeMirror-cursor {border-left: 1px solid #797977 !important;}
+

@@ -1,0 +1,130 @@
+
+
+
+
+/* GENERIC WINDOWS: */
+
+.center-wrapper {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: 90000;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    /* pointer-events: none; */
+}
+
+.center-inner {
+    width: 80vw;
+    height: 80vh;
+    max-width: 400px;
+    max-height: 600px;
+    background: var(--window_bg);
+    border: 1px solid var(--window_border);
+    font-family: sans-serif;
+    color: var(--fg_col);
+}
+
+.window-top {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--window_border);
+    font-weight: bold;
+}
+
+.window-top-title {
+    width: 90%;
+}
+
+.window-top-close-button {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+}
+
+.close-window-button-proper {
+    background: var(--window_close_button_bg);
+    color: var(--window_close_button_fg);  
+    border-radius: 0px;
+    border: 0;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.close-window-button-proper:hover {
+    background: var(--window_close_button_bg_highlighted);
+    color: var(--window_close_button_fg_highlighted);
+}
+
+.window-main {
+    width: 100%;
+    height: calc(100% - 120px);
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.window-bottom {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-top: 1px solid var(--window_border);
+}
+
+
+
+
+/* JUST FOR THE "OPEN PROJECT" WINDOW: */
+
+
+.project-entry {
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid var(--project_entry_border);
+    border-bottom: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: var(--project_entry_bg);
+}
+
+.project-entry:first-of-type {
+    border: 1px solid var(--project_entry_border);
+    border-radius: 8px 8px 0px 0px;
+    border-bottom: 0px;
+}
+
+.project-entry:last-of-type {
+    border: 1px solid var(--project_entry_border);
+    border-radius: 0px 0px 8px 8px;
+}
+
+
+.project-entry-left {
+    padding: 10px;
+    width: 58%;
+    overflow: hidden;
+}
+
+.project-entry-right {
+    padding: 10px;
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+

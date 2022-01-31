@@ -1,0 +1,28 @@
+/*
+
+    Name:       msncontrast
+
+
+*/
+
+
+
+.cm-s-msncontrast span.cm-block_command {color: #0FF;}
+
+.cm-s-msncontrast span.cm-sub_block_command {color: #0FF;}
+
+.cm-s-msncontrast span.cm-illegal {color: #F00;}
+
+.cm-s-msncontrast span.cm-asset {color: #0FF;}
+
+.cm-s-msncontrast span.cm-meta {color: #0FF;}
+
+.cm-s-msncontrast span.cm-block_comment {color: #0FF;}
+
+
+.cm-s-msncontrast.CodeMirror {background: #000; color: #fff;}
+.cm-s-msncontrast div.CodeMirror-selected {background: #36312e !important;}
+.cm-s-msncontrast .CodeMirror-gutters {background: #000; border-right: 0px;}
+.cm-s-msncontrast .CodeMirror-linenumber {color: #FFF;}
+.cm-s-msncontrast .CodeMirror-cursor {border-left: 1px solid #FFF !important;}
+

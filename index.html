@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Maisonette</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" type="image/png" href="icons/favicon.png" />
+
+
+
+  <link href="css/style.css" rel="stylesheet">
+
+  <link href="css/gui.css" rel="stylesheet">
+
+  <!--<link href="css/open-project-window.css" rel="stylesheet">-->
+
+  <link rel="stylesheet" href="codemirror-5.19.0/lib/codemirror.css">
+
+
+
+</head>
+
+<body>
+
+
+    <div id="dev-console">
+        <p><b>developer console</b><button class="my-button"
+                onclick="close_dev_console()">close</button></p>
+        <div id="dev-console-inner">
+        </div>
+        <table id="transpile-show-table">
+        </table>
+    </div>
+
+
+    <!-- MAIN VIEW: -->
+    <div class="wrapper">
+
+        <div class="xbar">
+
+            <button id="open-project" class = "my-button"
+                onclick="click_new_project()">new</button>
+  
+            <button id="open-project" class = "my-button"
+                onclick="click_open_project()">open</button>
+            
+            <button id="save" class = "my-button" onclick="click_save()">save</button>
+
+            <!--<button id="reload" class = "my-button" onclick="click_reload()">rebuild</button>-->
+            
+            <button id="backup" class = "my-button" onclick="click_backup()">backup</button>
+
+            <button id="export" class = "my-button" onclick="click_export()">export</button>
+
+            <button id="debug" class = "my-button" onclick="click_debug()">debug story</button>
+
+            <button id="developer" class = "my-button" onclick="open_dev_console()">developer</button>
+
+            <select id="themes">
+            </select>
+
+            <select id="show-editor">
+                <option value="show">show editor</option>
+                <option value="dont">hide editor</option>
+            </select>
+
+
+<!--            <select id="show-console">
+                <option value="dont">hide translation details</option>
+                <option value="show">show translation details</option>
+            </select>
+        -->
+        </div>
+
+        <div class="main-box">
+            
+            <div id="main-box-column-editor" class="main-box-column-editor">
+            </div>
+
+            <div id="main-box-column-preview" class="main-box-column-preview">
+                <div class="preview">
+                    <iframe id="preview-iframe" src="" title="preview"></iframe>
+                </div>
+
+                <div class="error-box"></div>
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <script src="js/jquery-3.6.0.min.js"></script>
+
+
+    <!--NOTE: we use codemirror 5.19, the last version of Codemirror to work
+    without modules. We do not use modules on purpose, because they make
+    for a bad refactoring experience.
+    Once the app is stabilized and working, we MAY consider switching
+    to ES6 modules. As long as the app is in flux and being
+    constantly rewritten, we believe that the disadvantages of modules
+    would outweigh the pros.
+    -->
+
+    <script src="codemirror-5.19.0/lib/codemirror.js"></script>
+    
+    <script src="codemirror-5.19.0/addon/mode/simple.js"></script>
+
+    <script src="code-mirror-maisonette-mode/msn.js"></script>
+
+
+
+    <link rel="stylesheet" href="code-mirror-maisonette-mode/msn-night.css">
+
+    <link rel="stylesheet" href="code-mirror-maisonette-mode/msn-blue.css">
+
+    <link rel="stylesheet" href="code-mirror-maisonette-mode/msn-day.css">
+
+    <link rel="stylesheet" href="code-mirror-maisonette-mode/msn-contrast.css">
+
+
+    <script src="js/utils.js"></script>
+
+    <script src="js/create-html-page.js"></script>
+
+    <script src="js/preprocessor.js"></script>
+
+    <script src="js/transpiler.js"></script>
+
+    <script src="js/themes.js"></script>
+
+    <script src="js/gui.js"></script>
+
+    <script src="js/run.js"></script>
+</body>
+
+</html>
+
+
+
+

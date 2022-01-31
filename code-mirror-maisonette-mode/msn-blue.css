@@ -1,0 +1,29 @@
+/*
+
+    Name:       msnblue
+
+
+*/
+
+
+
+.cm-s-msnblue span.cm-block_command {color: #0FF;}
+
+.cm-s-msnblue span.cm-sub_block_command {color: #0FF;}
+
+.cm-s-msnblue span.cm-illegal {color: #F00;}
+
+.cm-s-msnblue span.cm-asset {color: #0FF;}
+
+.cm-s-msnblue span.cm-meta {color: #0FF;}
+
+.cm-s-msnblue span.cm-block_comment {color: #0FF;}
+
+
+
+.cm-s-msnblue.CodeMirror {background: #008; color: #fff;}
+.cm-s-msnblue div.CodeMirror-selected {background: #36312e !important;}
+.cm-s-msnblue .CodeMirror-gutters {background: #002; border-right: 0px;}
+.cm-s-msnblue .CodeMirror-linenumber {color: #fff;}
+.cm-s-msnblue .CodeMirror-cursor {border-left: 1px solid #fff !important;}
+
