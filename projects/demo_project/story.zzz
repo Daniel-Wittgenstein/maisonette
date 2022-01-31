@@ -37,22 +37,13 @@ hhjjhhj
 ssdsdsa = 2 
 
 
-#comment I used to
-rule the world
-adnd fuckk them
-bitches
-
 #var x= 3 
  
 
 #option
 
-allow
-
 if x
-
-end
-
+	allow()
 end
 
 

@@ -78,7 +78,7 @@ function preprocess_strings_and_comments(code) {
             //leave normal code as it is:
             out += char
         } else if (state === "inside_comment") {
-            //strip out comments
+            //strip out comments,
             //nothing to do here
         } else if (state === "inside_string") {
             //convert strings, but leave line break as it is:

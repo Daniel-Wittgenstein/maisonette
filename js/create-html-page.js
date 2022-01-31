@@ -12,7 +12,7 @@ function make_html_safe(n) {
 function create_html_page(transpiled_js_files, collector, html_template_content,
     auto_includes_path, user_path, asset_path, transpiled_files_path) {
 
-    //returns error object or string containing entire html page
+    // returns error object or string containing entire html page
     
     let repl = [
         {
@@ -202,7 +202,6 @@ function create_html_page(transpiled_js_files, collector, html_template_content,
         html = html.replace(item.seq, (n => {
             if (error) return ""
             let result = item.do(n)
-            //console.log(22828282828, result)
             if (!result && result!=="") throw `Fatal error. ${item.seq} returned no result`
             if (result.error) {
                 error = result
@@ -214,14 +213,13 @@ function create_html_page(transpiled_js_files, collector, html_template_content,
     if (error) {
         return error
     }
-    //console.log("finished html", html)
     return html
 }
 
 
 
 function check_html(html) {
-    let x = document.createElement("div") //shouldn't leak memory.
+    let x = document.createElement("div") //Shouldn't leak memory.
         //node is created, not attached (hopefully)
     x.innerHTML = html
     let result = (x.innerHTML === html )
