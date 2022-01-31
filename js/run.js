@@ -274,7 +274,7 @@ function show_transpilation_error(e) {
         html += "</div>"
     }
 
-    $(".error-box").html(html)
+    $(".error-box-inner").html(html)
 
     show_error_box()
 
@@ -287,12 +287,12 @@ function show_transpilation_error(e) {
 
 //carvo
 function show_error_box(){
-    $(".error-box").show()
+    $(".error-box-inner").show()
     $(".preview").hide()    
 }
 
 function hide_error_box(){
-    $(".error-box").hide()
+    $(".error-box-inner").hide()
     $(".preview").show()
 }
 

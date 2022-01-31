@@ -1,5 +1,12 @@
 
 
+
+.error-box-inner {
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 18px;
+    font: monospace;
+}
+
 .editor-error-line {
     /* for showing errors inside codemirror! */
     border: 2px solid #e00;
