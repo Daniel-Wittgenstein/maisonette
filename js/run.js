@@ -285,7 +285,6 @@ function show_transpilation_error(e) {
 }
 
 
-//carvo
 function show_error_box(){
     $(".error-box-inner").show()
     $(".preview").hide()    

@@ -1128,14 +1128,11 @@ maisonette_transpiler = (function() {
                 return false
             }
         )
+
         if (stack.length) {
             error = `There seems to be an unclosed block. `
                 + `Maybe you forgot an 'end' statement.`
             line_nr = "unknown"
-        }
-
-        if (nu_lines.length !== lines.length) {
-            throw `developer bug: transpile_code_block. unequal line length`
         }
 
         if (error) {
@@ -1164,6 +1161,11 @@ maisonette_transpiler = (function() {
                 msg: `This block seems to contain wrong code: ${res2.error_obj}`,
                 original_error_obj: res2.error_obj,
             }
+        }
+
+
+        if (nu_lines.length !== lines.length) {
+            throw `developer bug: transpile_code_block. unequal line length`
         }
 
         lines = code2.split("\n")
