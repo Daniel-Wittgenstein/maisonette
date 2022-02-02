@@ -14,6 +14,7 @@
 
 #rule crush bottle
 	if  x = 3
+    sdsdadsdsadsa
     run: 
     
     

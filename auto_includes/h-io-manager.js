@@ -7,10 +7,16 @@ This is the app entry point.
 */
 
 
-//SET GLOBALS:
+//SET GLOBALS: (if you wanted to do: "window.yes", you would
+//have to remove the const, but you probably don't want to do that.)
 
-yes = true
-no = false
+const yes = true
+const no = false
+
+const carry_on = "carry_on"
+const stop = "stop"
+
+
 
 ;(function() {
 

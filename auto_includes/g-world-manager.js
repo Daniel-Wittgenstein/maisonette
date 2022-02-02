@@ -343,7 +343,7 @@ world_manager = (function() {
 */
 
     function register_rule(rule) {
-        //add rule to the pool of all rules (by its phase):
+        //add rule to the pool of all rules (by phase):
         //console.log("register", rule)
 
         if (rule.active === undefined) rule.active = true
@@ -530,6 +530,14 @@ world_manager = (function() {
     }
 
     function rule_applies(rule, action) {
+        //todo to do:
+        //this is still giving false positives, because
+        //the rule head is not checked.
+        //todo: check if rule head applies to action.
+        //we might have to speed this up with hash tables
+        //not checking all rules every time, but for now
+        //we do it like this. Then we will test and
+        //see if we need to improve performance.
         if (!rule.active) return false
         if ( !built_in_rule_checks(rule, action) ) return false
         if (!rule.if) return true
@@ -539,14 +547,15 @@ world_manager = (function() {
     function check_rule_if_condition(rule, action) {
         //return true if rule applies, false otherwise
         set_convenience_globals_from_action(action)
-        return rule.if(action.verb, action.thing, action)
+        return rule.if(action.verb, action.thing, action, rule)
     }
 
 
     function built_in_rule_checks(rule, action) {
         //optional built-in checks that override rule's if conditions
-        //return false to say that rule won't apply, true to say
-        //that it can apply (if its if-condiiton is ALSO met)
+        //return false to say that rule won't apply no matter what. Return
+        // true to say
+        //that it could apply (-> but only if its if-conditon is ALSO met)
         return true
     }
 
@@ -582,9 +591,6 @@ world_manager = (function() {
         return result
     }
 
-    function test_stuff() {
-
-    }
 
     parent.test = {}
     parent.test.get_verbs_for_thing_id = get_verbs_for_thing_id
@@ -753,28 +759,110 @@ world_manager = (function() {
         } */
    
         function take_action(action_string) {
-            /* This takes an action as an action_string.
+            /* THIS FUNCTION IS EXPORTED.
+            This takes an action as an action_string.
             This way the io-manager does not have to deal
             with action objects, it can just save actions as strings. */
             let action_obj = create_action_from_action_string(action_string)
-            take_action_proper(action_obj)
+            take_turn(action_obj)
             return true
         }
 
+        function say_rule_text_block(rule, txt) {
+            say (txt)
+        }
 
         function say(txt) {
             //todo
+            //this is just for testing, of course:
+            $("body").append("saying: " + txt)
         }
 
-        window.say = say //set as global for user convenience
+        function test_stuff() {
+            take_action("eat bottle")
+        }
 
-        function take_action_proper(action_obj) {
+        function take_turn(action_obj) {
             //todo
             //go through phases, check rules one by one
             //check if they apply, if they do, run their run function
+            //rules[rule.phase_name]
+            window.say = say //set as global for user convenience
+            do_rule_cascade(action_obj)
+            //todo: each_turn
 
-//fish
         }
+
+        function do_rule_cascade(action_obj) {
+            let order = [
+                "before",
+                "stop",
+                "carry_out",
+                "lib_carry_out",
+                "report",
+                "lib_report",
+                "after",  
+            ]
+            let skip_lib_carry_out = false
+            let skip_lib_report = false
+            let action = action_obj
+            //###############
+            for (let phase_name of order) {
+                let the_rules = rules[phase_name]
+                if (skip_lib_carry_out && phase_name === "lib_carry_out") continue
+                if (skip_lib_report && phase_name === "lib_report") continue
+                console.log("starting the phase:", phase_name)
+                
+                for (let rule of the_rules) {
+                    console.log("checking rule:", rule)
+                    //not that rule_applies sets
+                    //user convenience globals itself, no need
+                    //to set them here
+                    let applies = rule_applies(rule, action)
+                    if (!applies) continue
+
+                    console.log("rule applies")
+                    //perform rule also handles user convenience globals itself:
+                    let result = perform_rule(rule, action)
+                    console.log("result of performing the rule", result)
+
+                    if ( (result.run_result === "stop")
+                        || ( phase_name === "stop" &&
+                        result.run_result !== "carry_on") ) {
+                        return false
+                    }
+
+                    if (phase_name === "carry_out") {
+                        //a carry_out rule was performed and 
+                        //did not return "stop":
+                        skip_lib_carry_out = true
+                    } else if (phase_name === "report") {
+                        //a report rule was performed and 
+                        //did not return "stop":
+                        skip_lib_report = true
+                    }
+                }
+
+            }
+            //###############
+        }
+
+        function perform_rule(rule, action) {
+            if (rule.text) {
+                say_rule_text_block(rule, rule.text)
+            }
+            if (rule.run) {
+                set_convenience_globals_from_action(action)
+                let result = rule.run(action.verb,
+                        action.noun, action, rule)
+                return {
+                    run_result: result,
+                }
+            }
+            return {} //sic
+        }
+
+
 
         function create_action_from_action_string(str) {
             //currently only "verb thing" is allowed.
