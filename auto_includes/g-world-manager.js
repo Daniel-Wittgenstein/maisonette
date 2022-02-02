@@ -307,6 +307,7 @@ world_manager = (function() {
         if (!rule.props) rule.props = {}
 
         for (let tag of tags) {
+            tag = tag.replace("#", "").trim()
             rule.props[tag] = true
         }
 
