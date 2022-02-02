@@ -14,7 +14,12 @@
 
 #rule crush bottle
 	if  x = 3
-    run:   
+    run: 
+    
+    
+#rule eat flower (before) #some_tag
+You cannot take the flower.
+    
 
 #var x = 0
 

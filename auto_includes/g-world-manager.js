@@ -290,8 +290,11 @@ world_manager = (function() {
         if (parts.length != 2) {
             return {
                 error: true,
-                msg: `I was expecting two words in the rule head, for example: 'take bottle',
-                but instead I found: '${rule.head}'. This error may also be caused by a space
+                msg: `I was expecting two words in the rule head,
+                for example: 'take bottle',
+                but instead I found: '${rule.head}'. This error may also
+                be caused by an
+                unclosed bracket or by a space
                 after a hashtag. Write hashtags like #this, not like # this.`,
             }
         }
@@ -384,9 +387,33 @@ world_manager = (function() {
             specific_command_to_rules[acc].push(rule)
         }
 */
-
+        console.log("RULES", rules)
 
     }
+
+
+        
+    function get_suggestions_by_thing(thing_id) {
+        //THIS FUNCTION IS EXPORTED
+        /*
+            should return an array containing object entries as such:
+            {
+                verb: "my_verb_id",
+                display_priority: 42,
+                custom_text: false, //or string: "some custom string"
+            }
+    
+        */
+        //get verb list from get_verbs_for_thing_id:
+        let lst = get_verbs_for_thing_id(thing_id)
+        if (lst.length === 0) return []
+        //sort by display_priority:
+        lst = lst.sort( (a, b) => {
+            return a.display_priority - b.display_priority //or viceversa. test
+        })
+        return lst
+    }
+
 
 
     function get_verbs_for_thing_id(thing_id) {
@@ -397,12 +424,13 @@ world_manager = (function() {
         const def_prio = 20 //default priority for specific actions
         const def_prio_opt = 10 //default priority for option added actions
 
-        function do_add_option(verb_id, prio) {
+        function do_add_option(verb_id, prio, custom_text) {
             if (prio === undefined) prio = def_prio_opt
             //add verb with prio:
             verb_list.push({
                 verb: verb_id,
                 display_priority: prio,
+                custom_text,
             })
         }
         
@@ -441,8 +469,8 @@ world_manager = (function() {
         //3. now we have to run option blocks. Each option block
         //gets passed the thing. add_option and remove_option can add or remove verbs
         //3.1 first make the functions global:
-        window.add_option = (verb_id, prio) => {
-            do_add_option(verb_id, prio)
+        window.add_option = (verb_id, prio, custom_text) => {
+            do_add_option(verb_id, prio, custom_text)
         }
         window.remove_option = (verb_id) => {
             do_remove_option(verb_id)
@@ -723,11 +751,83 @@ world_manager = (function() {
 
         } */
    
+        function take_action(action_string) {
+            /* This takes an action as an action_string.
+            This way the io-manager does not have to deal
+            with action objects, it can just save actions as strings. */
+            let action_obj = create_action_from_action_string(action_string)
+            take_action_proper(action_obj)
+            return true
+        }
+
+
+        function say(txt) {
+            //todo
+        }
+
+        window.say = say //set as global for user convenience
+
+        function take_action_proper(action_obj) {
+            //todo
+            //go through phases, check rules one by one
+            //check if they apply, if they do, run their run function
+
+//fish
+        }
+
+        function create_action_from_action_string(str) {
+            //currently only "verb thing" is allowed.
+            //eventually there might be more options for creating an action
+            let p = str.split(" ").map(n => n.trim()).filter( n => n)
+            let verb_id = p[0]
+            let thing_id = p[1]
+            if (p.length !== 2) throw `Invalid action string: ${str}`
+            let action_obj = new Action(verb_id, thing_id)
+            return action_obj
+        }
+
+        function restart_story() {
+            //todo
+            return true
+        }
+    
+        function get_state() {
+            let state = {
+                is_world_manager_state: true,
+            }
+            //todo
+            return state
+        }
+        
+        
+        function set_state(state) {
+            if (!state.is_world_manager_state) {
+                throw `set_state: Not a valid world manager state.`
+                return false
+            }
+            //todo
+            return true
+        }
+
+
+
         return {
+            //initialization:
             load_block,
-            log_load_info,
             set_global_hooks,
+
+            //after initialization:
+            take_action,
+            restart_story,
+            get_state,
+            set_state,
+            get_suggestions_by_thing,
+            
+            //test/debug:
+            log_load_info,
             test_stuff,
+
+            
         }
 
 })()
