@@ -12,7 +12,6 @@ This is the app entry point.
 yes = true
 no = false
 
-
 ;(function() {
 
     //setup the functions that will be used
@@ -20,6 +19,8 @@ no = false
     //(entry points for transpiled maisonette
     //(.zzz) files):
     //#################################
+
+
 
     let props = [
         "r", "f", "t", "v", "img", 
@@ -146,12 +147,13 @@ no = false
         world_manager.log_load_info()
 
         let result = world_manager.set_global_hooks(window,
-            props, {globalize_all_entities: true})
+            {globalize_all_entities: true})
 
         if (result.error) {
             show_error(result)
             return
         }
+        world_manager.test_stuff()
 
     })
 

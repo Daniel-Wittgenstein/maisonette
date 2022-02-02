@@ -936,6 +936,8 @@ function start() {
     init_editor_shower()
 
     init_keyboard_shortcuts()
+
+    generate_the_story()
 }
 
 function init_keyboard_shortcuts() {

@@ -148,6 +148,8 @@ world_manager = (function() {
             //variables: id is always name of variable itself
             attach_debug_info(v_obj, file_name, line_nr, org_text)
 
+            //wooooooooooooooooot???
+
         } else if (type === "rel") {
             if (args[0].trim() !== "") {
                 return {
@@ -181,8 +183,8 @@ world_manager = (function() {
             option_id_count++
             let option_id = "$_option_" + option_id_count
             args[1].id = option_id
-            attach_debug_info(args[1], file_name, line_nr, org_text)
-
+            attach_debug_info(args[1], file_name, line_nr, org_text) //attaches
+                //info to function, which is a bit weird, but ok.
         } else if( type === "f") {
             let name = args[0]
             if (functions[name]) {
@@ -325,15 +327,23 @@ world_manager = (function() {
     let rule_specific_match_table = {
         by_verb: {},
         by_thing: {},
-    } //key: "take" or "bottle" / value: [array of all specific rules
-    // with head 'take bottle' ] This is important, because we want to check
-    //whether specific rules for an action exist and whether they currently apply -> that
-    //information is used for locking/unlocking options (among other information,
-    //there are more criteria, including manual, user-defined ones)
+    }
+
+/*
+    let specific_command_to_rules = {}
+
+    function get_all_specific_rules_for_command(verb_id, thing_id) {
+        let acc = verb_id + "_§_" + thing_id
+        return specific_command_to_rules[acc]
+    }
+*/
 
     function register_rule(rule) {
         //add rule to the pool of all rules (by its phase):
         //console.log("register", rule)
+
+        if (rule.active === undefined) rule.active = true
+
         if (!rules[rule.phase_name]) {
             rules[rule.phase_name] = []
         }
@@ -354,12 +364,9 @@ world_manager = (function() {
             }
         }
 
-        //if it's a specific rule, also add it to the
-        //pool of specific rules (by its verb / noun signature):
-        //broken. fix.
-        if (rule.specificity === "specificity") {
-            for ( let prop of ["verb", "noun"] ) {
-                let acc = rule[prop]
+        if (rule.specificity === "specific") {
+            for ( let prop of ["thing"] ) { //["verb", "thing"]
+                let acc = rule["required_" + prop]
                 if (!rule_specific_match_table["by_" + prop][acc]) {
                     rule_specific_match_table["by_" + prop][acc] = []
                 }
@@ -367,21 +374,158 @@ world_manager = (function() {
             }
         }
 
-        console.log(rule_specific_match_table)
+
+        /*
+        if (rule.specificity === "specific") {
+            let acc = rule.required_verb + "_§_" + rule.required_thing
+            if ( !specific_command_to_rules[acc] ) {
+                specific_command_to_rules[acc] = []
+            }
+            specific_command_to_rules[acc].push(rule)
+        }
+*/
+
+
     }
 
 
-    function get_verbs_for_thing(thing) {
-        //pass a thing. returns all verbs that can currently be used with the thing.
-        //first we have to check specific rules where the thing appears:
+    function get_verbs_for_thing_id(thing_id) {
+        //pass a thing.id - returns a list of all verbs that can currently be
+        //used with the thing.
 
+        //higher prio should mean: further up
+        const def_prio = 20 //default priority for specific actions
+        const def_prio_opt = 10 //default priority for option added actions
+
+        function do_add_option(verb_id, prio) {
+            if (prio === undefined) prio = def_prio_opt
+            //add verb with prio:
+            verb_list.push({
+                verb: verb_id,
+                display_priority: prio,
+            })
+        }
+        
+        function do_remove_option(verb_id) {
+            //remove ALL entries with verb "verb"
+            verb_list = verb_list.filter( e => {
+                    return e.verb !== verb_id
+                }
+            )
+        }
+        
+        //1. first we have to get specific rules that a) apply and b) where the
+            //thing appears:
+        let spec_rules_list = get_specific_applying_rules_by_thing_id(thing_id)
+
+        console.log("spec", spec_rules_list)
+
+        //2. now we have all the specific rules, but we have to create a verb
+        //list out of that:
+
+        let verb_list = spec_rules_list.map( r =>
+            {
+                let prio
+                if (r.display_priority === undefined) {
+                    prio = def_prio
+                } else {
+                    prio = r.display_priority
+                }
+                return {
+                    display_priority: prio,
+                    verb: r.required_verb,
+                }
+            }
+        )
+
+        //3. now we have to run option blocks. Each option block
+        //gets passed the thing. add_option and remove_option can add or remove verbs
+        //3.1 first make the functions global:
+        window.add_option = (verb_id, prio) => {
+            do_add_option(verb_id, prio)
+        }
+        window.remove_option = (verb_id) => {
+            do_remove_option(verb_id)
+        }
+        //3.2 now run all option blocks in order, passing thing object to them
+        //but if one returns "stop", stop running,
+        //the option blocks will call add_option and remove_option,
+        //and we will update verb_list accordingly
+        let thing_obj = get_thing_by_id(thing_id)
+        for (let opt of options) {
+            let res = opt(thing_obj)
+            if (res === "stop") {
+                break
+            }
+        }
+        
+        return verb_list
+        
     }
- 
+
+//class Action verb ad thing must be things not ids
+
+    class Action {
+        constructor(verb_id, thing_id) {
+            let verb_obj = get_thing_by_id(verb_id) //verbs are just things
+            let thing_obj = get_thing_by_id(thing_id)
+            this.verb = verb_obj
+            this.thing = thing_obj
+        }
+    }
+
+    function get_thing_by_id(id) {
+        return things[id]
+    }
+
+    function set_convenience_globals_from_action(action) {
+        window.verb = action.verb
+        window.thing = action.thing
+        window.noun = action.noun
+    }
+
+
+
+    function get_specific_applying_rules_by_thing_id(thing_id) {
+        console.log("match table", rule_specific_match_table)
+        let specific_rules_lst = rule_specific_match_table.by_thing[thing_id]
+        if (!specific_rules_lst) return []
+
+        specific_rules_lst = specific_rules_lst.filter(
+            rule => {
+                let action = new Action(rule.required_verb, thing_id)
+                return rule_applies(rule, action)
+            }
+        )
+        return specific_rules_lst
+    }
+
+    function rule_applies(rule, action) {
+        if (!rule.active) return false
+        if ( !built_in_rule_checks(rule, action) ) return false
+        if (!rule.if) return true
+        return check_rule_if_condition(rule, action)
+    }
+
+    function check_rule_if_condition(rule, action) {
+        //return true if rule applies, false otherwise
+        set_convenience_globals_from_action(action)
+        return rule.if(action.verb, action.thing, action)
+    }
+
+
+    function built_in_rule_checks(rule, action) {
+        //optional built-in checks that override rule's if conditions
+        //return false to say that rule won't apply, true to say
+        //that it can apply (if its if-condiiton is ALSO met)
+        return true
+    }
 
     let glob
 
+
     function set_global_hooks(global_main,
-        props, options) {
+        options) {
         /* 1. parameter: global_main: the world_manager will
         auto-populate this object with handy
         variables like "noun" etc. and keep
@@ -395,31 +539,32 @@ world_manager = (function() {
         have to type "story.bottle" or whatever. We like
         globals so we pass window from the io_manager. The non-global usage
         of this function is currently untested and may break. 
-        2.: object with key: value where
-        key is a valid global property the world_manager knows
-        and value is how you want that property to be named in a global
-        context. (so instead of noun = current_thing, we do
-                GLOBAL[props.noun] = current_thing)
-                where props.noun may be "noun" or "thing" or whatever
-        3. additional options
+
+        2. additional options
         */
         glob = global_main
-        glob_lookup = props
         let result = true
         if (options) {
             if (options.globalize_all_entities) {
-                result = globalize_all_entities(glob, glob_lookup)
+                result = globalize_all_entities(glob)
             }
         }
 
         return result
     }
 
+    function test_stuff() {
+
+    }
+
+    parent.test = {}
+    parent.test.get_verbs_for_thing_id = get_verbs_for_thing_id
     
-    function globalize_all_entities(glob, glob_lookup) {
+    function globalize_all_entities(glob) {
         //makes all thing, relation etc. ids global.
         //note for testing: if you type a thing's name
-        //in the dev console that is opened via F12, it will still show up as undefined,
+        //in the dev console that is opened via F12, it will still
+        //show up as undefined,
         //because globals were only set for the iframe window,
         //not for the nw.js app! (as it should be)
         //BUT if you open the dev tools via the dedicated
@@ -429,13 +574,12 @@ world_manager = (function() {
         //this is potentially useful for story creators, because
         //they can use the dev tools to view object properties at runtime.
         //not bad!
-        //and it eve shows you in which line and which file the thing
+        //and it even shows you in which line and which file the thing
         //was defined. yikes, that's nice!
         let lst
 
         lst = [].concat(
             Object.values(things),
-            Object.values(vars),
             Object.values(relation_types),
             Object.values(options),
         ) //assets is not added. we don't make them global
@@ -472,7 +616,8 @@ world_manager = (function() {
                 return {
                     error: true,
                     msg: `You have a function with id '${key}', but there is another
-                        entity by the same id. (The text '#function ${key}' seems to be a problem.)`,
+                        entity by the same id.
+                        (The text '#function ${key}' seems to be a problem.)`,
                 }
             }
             glob[key] = value
@@ -558,7 +703,8 @@ world_manager = (function() {
             if (type === "a") target = "allow_rules" //how does this work?
             if (type === "t") target = "things"
             if (type === "v") target = "vars"
-            //if (type === "f") target = "things" func is broken still, needs to be transpiled
+            //if (type === "f") target = "things" func is broken
+            still, needs to be transpiled
             //not as quad but as simplex or even... as new kind of (raw) block???
         things: {},
         rules: {},
@@ -581,6 +727,7 @@ world_manager = (function() {
             load_block,
             log_load_info,
             set_global_hooks,
+            test_stuff,
         }
 
 })()

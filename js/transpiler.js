@@ -4,6 +4,9 @@
 todo to do:
 
 
+- bring back var definitions to the transpiler. it makes way
+more sense.
+
 - cache entries must expire
 by timestamp, otherwise cache
 gets gigantic. (currently cache is disabled, anyway, though,

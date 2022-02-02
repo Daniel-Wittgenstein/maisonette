@@ -1,57 +1,28 @@
 
 
 
-#option aaasssasa dsdsdsds dsdsds dssddsdsxx
 
 #rule take bottle
-	if x = 5
 
     run:   
-    
-    
-    e = 4+4
-    
-#title sdsd
-    
-#thing
-props: 2
-may: `dsdsds`
-fu: 7
-e: 4
 
 
+#rule eat bottle
+
+    run:   
 
 
+#rule crush bottle
+	if  x = 3
+    run:   
 
-#author dsdasdsadsa
+#var x = 0
 
-#comment
-hhjjhhj
+#option 
 
-
-#video s dsasd 
-
-
-#option
-
-ssdsdsa = 2 
-
-
-#var x= 3 
- 
-
-#option
-
-if x
-	allow()
-end
-
-
-
-
-
-
-
+add_option("drink")
+remove_option("eat")
+console.log(2222, x)
 
 
 
