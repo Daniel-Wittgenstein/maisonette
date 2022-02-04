@@ -13,6 +13,14 @@
 
 world_manager = (function() {
 
+    let settings = {
+        accessibility_links_as_links: true,
+    }
+
+    function set_settings_option(prop, value) {
+        settings[prop] = value
+    }
+
     let DEFAULT_PHASE_NAME = "stop"
 
     let meta_data = {
@@ -500,6 +508,8 @@ world_manager = (function() {
             let thing_obj = get_thing_by_id(thing_id)
             this.verb = verb_obj
             this.thing = thing_obj
+            if (!this.verb) this.invalid_verb = true
+            if (!this.thing) this.invalid_thing = true
         }
     }
 
@@ -530,19 +540,26 @@ world_manager = (function() {
     }
 
     function rule_applies(rule, action) {
-        //todo to do:
-        //this is still giving false positives, because
-        //the rule head is not checked.
-        //todo: check if rule head applies to action.
-        //we might have to speed this up with hash tables
-        //not checking all rules every time, but for now
-        //we do it like this. Then we will test and
-        //see if we need to improve performance.
         if (!rule.active) return false
+        let res = check_rule_head_against_action(rule, action)
+        if (!res) return false
         if ( !built_in_rule_checks(rule, action) ) return false
         if (!rule.if) return true
         return check_rule_if_condition(rule, action)
     }
+
+
+    function check_rule_head_against_action(rule, action) {
+        console.log("reload", rule.head, action, rule)
+        let v = rule.required_verb
+        let t = rule.required_thing
+        return (
+            ( v === "*" || get_thing_by_id(v) === action.verb )
+            &&
+            ( t === "*" || get_thing_by_id(t) === action.thing )
+        )
+    }
+
 
     function check_rule_if_condition(rule, action) {
         //return true if rule applies, false otherwise
@@ -757,16 +774,36 @@ world_manager = (function() {
 
 
         } */
-   
-        function take_action(action_string) {
+
+        function take_turn(action_str) {
             /* THIS FUNCTION IS EXPORTED.
             This takes an action as an action_string.
             This way the io-manager does not have to deal
             with action objects, it can just save actions as strings. */
-            let action_obj = create_action_from_action_string(action_string)
-            take_turn(action_obj)
-            return true
+
+            console.log("take turn", action_str)
+            let res = take_turn_proper(action_str)
+            if (res.error) {
+                throw "take_turn: " + res.msg
+            }
         }
+
+        function take_turn_proper(action_string) {
+            //create action object from string:
+            let action_obj = create_action_from_action_string(action_string)
+            if (action_obj.error) {
+                return action_obj
+            }
+
+            //do rule cascade:
+            window.say = say //set as global for user convenience
+            do_rule_cascade(action_obj)
+            
+            //todo to do: foreach
+
+            return {error: false}
+        }
+   
 
         function say_rule_text_block(rule, txt) {
             say (txt)
@@ -775,23 +812,16 @@ world_manager = (function() {
         function say(txt) {
             //todo
             //this is just for testing, of course:
-            $("body").append("saying: " + txt)
+            let res = process_complex_text_block(txt)
+            let html = res.html
+            $("body").append("saying: " + html)
         }
 
         function test_stuff() {
-            take_action("eat bottle")
-        }
-
-        function take_turn(action_obj) {
-            //todo
-            //go through phases, check rules one by one
-            //check if they apply, if they do, run their run function
-            //rules[rule.phase_name]
-            window.say = say //set as global for user convenience
-            do_rule_cascade(action_obj)
-            //todo: each_turn
 
         }
+
+
 
         function do_rule_cascade(action_obj) {
             let order = [
@@ -801,7 +831,7 @@ world_manager = (function() {
                 "lib_carry_out",
                 "report",
                 "lib_report",
-                "after",  
+                "after", 
             ]
             let skip_lib_carry_out = false
             let skip_lib_report = false
@@ -812,7 +842,7 @@ world_manager = (function() {
                 if (skip_lib_carry_out && phase_name === "lib_carry_out") continue
                 if (skip_lib_report && phase_name === "lib_report") continue
                 console.log("starting the phase:", phase_name)
-                
+                if (!the_rules) continue
                 for (let rule of the_rules) {
                     console.log("checking rule:", rule)
                     //not that rule_applies sets
@@ -867,11 +897,29 @@ world_manager = (function() {
         function create_action_from_action_string(str) {
             //currently only "verb thing" is allowed.
             //eventually there might be more options for creating an action
+            if (!isString(str)) return {error: true, msg: `Invalid action string: not a string`}
             let p = str.split(" ").map(n => n.trim()).filter( n => n)
             let verb_id = p[0]
             let thing_id = p[1]
-            if (p.length !== 2) throw `Invalid action string: ${str}`
+            if (p.length !== 2) {
+                return {
+                    error: true,
+                    msg: `Invalid action string: ${str}`,
+                }
+            }
             let action_obj = new Action(verb_id, thing_id)
+            if (action_obj.invalid_verb) {
+                return {
+                    error: true,
+                    msg: `Invalid verb: '${verb_id}'`,
+                }
+            }
+            if (action_obj.invalid_thing) {
+                return {
+                    error: true,
+                    msg: `Invalid thing: '${thing_id}'`,
+                }
+            }
             return action_obj
         }
 
@@ -900,24 +948,178 @@ world_manager = (function() {
 
 
 
+
+        function process_complex_text_block(str) {
+            /* Takes string: text that was sent to "say" by user, either
+            implicitly via a rule's text block or explicitly via
+            the global say command, or again implicitly by defining text inside
+            a weave block.
+            Returns error object or object containing optional
+            meta information and (most importantly)
+            a string containing valid HTML ready to be injected into the page.
+            This may cause side-effects like variable setting, if the text contains
+            such instructions. The say command should only care about its
+            return value, though.
+            This is supposed to be run at runtime and re-run on each new text block
+            output. So the same input won't necessarily yield same or
+            even reproducible results (because of potential random functions
+            inside the text).
+            */
+            let segs = split_string_into_segments(str)
+            if (segs.error) return segs
+            let out = ""
+            let data = []
+            segs.forEach(
+                seg => {
+                    if (seg.type === "((") {
+                        let res = convert_link_text_to_html(seg.text)
+                        if (res.error) return res
+                        out += res.html
+                        if (res.data) {
+                            data.push(res.data)
+                        }
+                    } else if (seg.type === "normal") {
+                        out += seg.text
+                    } else {
+                        //for now don't do anything special with {} and [] blocks
+                        out += seg.text
+                    }
+                }
+            )
+            return {
+                html: out,
+                error: false,
+                data: data,
+            }
+        }
+
+        function convert_link_text_to_html(txt) {
+            let parts = txt.split("*").map(n => n.trim()).filter(n => n)
+            let html = ""
+            let data = {
+                mentioned_linked_things: [], //things that got a link
+            }
+            let text = parts[0]
+            let id = parts[1]
+            if (parts.length === 1) id = parts[0].trim().toLowerCase()
+            let thing = get_thing_by_id(id)
+            if (!thing) {
+                return {
+                    error: true,
+                    msg: `Link '${txt}': '${id}' is not a valid thing id.`,
+                }
+            }
+            data.mentioned_linked_things.push(thing)
+            if (settings.accessibility_links_as_links) {
+                html = `<a href="#" class="msn-link msn-link-for-thing
+                    msn-link-as-link" data-thing-id="${id}">${txt}</a>`
+            } else {
+                html = `<span class="msn-link msn-link-for-thing
+                    msn-link-as-span" data-thing-id="${id}">${txt}</span>`
+            }
+            return {
+                html: html,
+                data: data,
+                error: false,
+            }
+        }
+
+
+        function split_string_into_segments(str) {
+            /* takes string, returns parsed result.
+            splits into segments by {} [] and (())
+            does not support nesting.*/
+
+            //adding more segments should be rather easy,
+            //just change this config object:
+            let config = {
+                "{": {type: "{", state: "start"},
+                "}": {type: "{", state: "end"},
+                "[": {type: "[", state: "start"},
+                "]": {type: "[", state: "end"},
+                "(": {type: "((", next: "(", state: "start"},
+                ")": {type: "((", next: ")", state: "end"},
+            }
+            let i = -1
+            let inside = "normal"
+            let out = []
+            let mark = 0
+            for (let char of str) {
+                i++
+                let next = str.substr(i + 1, 1)
+                let v = config[char]
+                if (v && (!v.next || v.next === next) ) {
+                    if (v.state === "start") {
+                        if (inside !== "normal") {
+                            let ctx = str.substr(i - 10, 20)
+                            return {
+                                error: true,
+                                msg: `Inside a '${inside}'-segment I found a ${v.type}-segment, but
+                                    nesting is not allowed here. Column: ${i}, Context: ${ctx}`,
+                                col: i,
+                            }
+                        }
+                        let piece = str.substring(mark, i)
+                        mark = i
+                        out.push({
+                            text: piece,
+                            type: inside,
+                        })
+                        inside = v.type
+                    } else {
+                        if (inside !== v.type) {
+                            let ctx = str.substr(i - 10, 20)
+                            return {
+                                error: true,
+                                msg: `I found '${char}', but there was no such segment
+                                    to close. Column: ${i}, Context: ${ctx}`,
+                                col: i,
+                            }
+                        }
+                        let piece = str.substring(mark, i)
+                        mark = i
+                        out.push({
+                            text: piece.replace(v.type, ""),
+                            type: inside,
+                        })
+                        inside = "normal"
+                    }
+                }
+            }
+            if (inside !== "normal") {
+                return {
+                    error: true,
+                    msg: `Unclosed segment.`,
+                }
+            }
+            return out
+        }
+
+
+
         return {
             //initialization:
             load_block,
             set_global_hooks,
 
             //after initialization:
-            take_action,
+            take_turn,
             restart_story,
             get_state,
             set_state,
             get_suggestions_by_thing,
-            
+            set_settings_option,
+
             //test/debug:
             log_load_info,
             test_stuff,
 
             
+            
         }
 
 })()
 
+
+//testing:
+parent.wm = world_manager

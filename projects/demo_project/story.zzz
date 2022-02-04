@@ -2,37 +2,38 @@
 
 
 
-#rule take bottle
-
-    run:   
-
-
-#rule eat bottle
-
-    run:   
+#thing eat
+is_verb: true,
 
 
-#rule crush bottle
-	if  x = 3
-    sdsdadsdsadsa
-    run: 
-    
-    
-#rule eat flower (before) #some_tag   	#222
-You cannot take the flower.
-    
+#thing drink
+is_verb: yes,
 
-#var x = 0
-
-#option 
-
-add_option("drink")
-remove_option("eat")
-console.log(2222, x)
+#thing take"
+is_verb: yes
 
 
+#thing lemonade
+edible: no
+drinkable: yes
+
+#thing sandwich
+edible: yes
+
+#thing apple
+drinkable: false
+edible: yes
+
+#thing fork
 
 
+#rule eat sandwich
+You eat the sandwich.
+run:
+return carry_on
+
+#rule eat * (after)
+It tasted rather bad.
 
 
 

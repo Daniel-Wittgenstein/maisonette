@@ -159,12 +159,24 @@ const stop = "stop"
             show_error(result)
             return
         }
-        world_manager.test_stuff()
+
+        //create a global object that contains
+        //some additional convenience functions
+        //for the user (namespaced to an object,
+        //because they won't be used all the time):
+
+        window.mais = {
+            set_wm_option: world_manager.set_settings_option,
+        }
+
+        //world_manager.take_action("eat sandwih")
 
     })
 
 
 
+
+    
 })()
 
 
