@@ -28,9 +28,24 @@ edible: yes
 
 
 #rule eat sandwich
-You eat the sandwich.
-run:
-return carry_on
+You eat ((the sandwich * sandwich )).
+
+#rule drink sandwich
+That's not possible.
+
+#option
+
+	if thing = sandwich: add_option("take")
+
+
+
+#rule eat * (before)
+	Eating is not your thing.
+	run:
+		return stop
+	props:
+    	active: no
+        
 
 #rule eat * (after)
 It tasted rather bad.

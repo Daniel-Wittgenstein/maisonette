@@ -13,9 +13,7 @@
 
 world_manager = (function() {
 
-    let settings = {
-        accessibility_links_as_links: true,
-    }
+    let settings = {} //none yet
 
     function set_settings_option(prop, value) {
         settings[prop] = value
@@ -391,7 +389,7 @@ world_manager = (function() {
         //add rule to the pool of all rules (by phase):
         //console.log("register", rule)
 
-        if (rule.active === undefined) rule.active = true
+        if (rule.props.active === undefined) rule.props.active = true
 
         if (!rules[rule.phase_name]) {
             rules[rule.phase_name] = []
@@ -455,7 +453,7 @@ world_manager = (function() {
         if (lst.length === 0) return []
         //sort by display_priority:
         lst = lst.sort( (a, b) => {
-            return a.display_priority - b.display_priority //or viceversa. test
+            return b.display_priority - a.display_priority //or viceversa. test
         })
         return lst
     }
@@ -527,6 +525,11 @@ world_manager = (function() {
         //and we will update verb_list accordingly
         let thing_obj = get_thing_by_id(thing_id)
         for (let opt of options) {
+            //set user convenience globals
+            window.thing = thing_obj
+            window.noun = thing_obj
+            window.verb = false //not defined here, but explicitly set to false,
+                //is cleaner
             let res = opt(thing_obj)
             if (res === "stop") {
                 break
@@ -577,7 +580,7 @@ world_manager = (function() {
     }
 
     function rule_applies(rule, action) {
-        if (!rule.active) return false
+        if (!rule.props.active) return false
         let res = check_rule_head_against_action(rule, action)
         if (!res) return false
         if ( !built_in_rule_checks(rule, action) ) return false
@@ -812,348 +815,471 @@ world_manager = (function() {
 
         } */
 
-        function take_turn(action_str) {
-            /* THIS FUNCTION IS EXPORTED.
-            This takes an action as an action_string.
-            This way the io-manager does not have to deal
-            with action objects, it can just save actions as strings. */
+    function take_turn(action_str) {
+        /* THIS FUNCTION IS EXPORTED.
+        This takes an action as an action_string.
+        This way the io-manager does not have to deal
+        with action objects, it can just save actions as strings. */
 
-            console.log("take turn", action_str)
-            let res = take_turn_proper(action_str)
-            if (res.error) {
-                throw "take_turn: " + res.msg
-            }
+        console.log("take turn", action_str)
+        let res = take_turn_proper(action_str)
+        if (res.error) {
+            throw "take_turn: " + res.msg
         }
+    }
 
-        function take_turn_proper(action_string) {
-            //create action object from string:
-            let action_obj = create_action_from_action_string(action_string)
-            if (action_obj.error) {
-                return action_obj
-            }
-
-            //do rule cascade:
-            window.say = say //set as global for user convenience
-            do_rule_cascade(action_obj)
-            
-            //todo to do: foreach
-
-            return {error: false}
-        }
-   
-
-        function say_rule_text_block(rule, txt) {
-            say (txt)
-        }
-
-        function say(txt) {
-            //todo
-            //this is just for testing, of course:
-            let res = process_complex_text_block(txt)
-            let html = res.html
-            $("body").append("saying: " + html)
-        }
-
-        function test_stuff() {
-
-        }
-
-
-
-        function do_rule_cascade(action_obj) {
-            let order = [
-                "before",
-                "stop",
-                "carry_out",
-                "lib_carry_out",
-                "report",
-                "lib_report",
-                "after", 
-            ]
-            let skip_lib_carry_out = false
-            let skip_lib_report = false
-            let action = action_obj
-            //###############
-            for (let phase_name of order) {
-                let the_rules = rules[phase_name]
-                if (skip_lib_carry_out && phase_name === "lib_carry_out") continue
-                if (skip_lib_report && phase_name === "lib_report") continue
-                console.log("starting the phase:", phase_name)
-                if (!the_rules) continue
-                for (let rule of the_rules) {
-                    console.log("checking rule:", rule)
-                    //not that rule_applies sets
-                    //user convenience globals itself, no need
-                    //to set them here
-                    let applies = rule_applies(rule, action)
-                    if (!applies) continue
-
-                    console.log("rule applies")
-                    //perform rule also handles user convenience globals itself:
-                    let result = perform_rule(rule, action)
-                    console.log("result of performing the rule", result)
-
-                    if ( (result.run_result === "stop")
-                        || ( phase_name === "stop" &&
-                        result.run_result !== "carry_on") ) {
-                        return false
-                    }
-
-                    if (phase_name === "carry_out") {
-                        //a carry_out rule was performed and 
-                        //did not return "stop":
-                        skip_lib_carry_out = true
-                    } else if (phase_name === "report") {
-                        //a report rule was performed and 
-                        //did not return "stop":
-                        skip_lib_report = true
-                    }
-                }
-
-            }
-            //###############
-        }
-
-        function perform_rule(rule, action) {
-            if (rule.text) {
-                say_rule_text_block(rule, rule.text)
-            }
-            if (rule.run) {
-                set_convenience_globals_from_action(action)
-                let result = rule.run(action.verb,
-                        action.noun, action, rule)
-                return {
-                    run_result: result,
-                }
-            }
-            return {} //sic
-        }
-
-
-
-        function create_action_from_action_string(str) {
-            //currently only "verb thing" is allowed.
-            //eventually there might be more options for creating an action
-            if (!isString(str)) return {error: true, msg: `Invalid action string: not a string`}
-            let p = str.split(" ").map(n => n.trim()).filter( n => n)
-            let verb_id = p[0]
-            let thing_id = p[1]
-            if (p.length !== 2) {
-                return {
-                    error: true,
-                    msg: `Invalid action string: ${str}`,
-                }
-            }
-            let action_obj = new Action(verb_id, thing_id)
-            if (action_obj.invalid_verb) {
-                return {
-                    error: true,
-                    msg: `Invalid verb: '${verb_id}'`,
-                }
-            }
-            if (action_obj.invalid_thing) {
-                return {
-                    error: true,
-                    msg: `Invalid thing: '${thing_id}'`,
-                }
-            }
+    function take_turn_proper(action_string) {
+        //create action object from string:
+        let action_obj = create_action_from_action_string(action_string)
+        if (action_obj.error) {
             return action_obj
         }
 
-        function restart_story() {
-            //todo
-            return true
+        //do rule cascade:
+        window.say = say //set as global for user convenience
+        do_rule_cascade(action_obj)
+        
+        //todo to do: foreach
+
+        return {error: false}
+    }
+
+
+
+
+
+    function do_rule_cascade(action_obj) {
+        let order = [
+            "before",
+            "stop",
+            "carry_out",
+            "lib_carry_out",
+            "report",
+            "lib_report",
+            "after", 
+        ]
+        let skip_lib_carry_out = false
+        let skip_lib_report = false
+        let action = action_obj
+        //###############
+        for (let phase_name of order) {
+            let the_rules = rules[phase_name]
+            if (skip_lib_carry_out && phase_name === "lib_carry_out") continue
+            if (skip_lib_report && phase_name === "lib_report") continue
+            console.log("starting the phase:", phase_name)
+            if (!the_rules) continue
+            for (let rule of the_rules) {
+                console.log("checking rule:", rule)
+                //not that rule_applies sets
+                //user convenience globals itself, no need
+                //to set them here
+                let applies = rule_applies(rule, action)
+                if (!applies) continue
+
+                console.log("rule applies")
+                //perform rule also handles user convenience globals itself:
+                let result = perform_rule(rule, action)
+                console.log("result of performing the rule", result)
+
+                if ( (result.run_result === "stop")
+                    || ( phase_name === "stop" &&
+                    result.run_result !== "carry_on") ) {
+                    return false
+                }
+
+                if (phase_name === "carry_out") {
+                    //a carry_out rule was performed and 
+                    //did not return "stop":
+                    skip_lib_carry_out = true
+                } else if (phase_name === "report") {
+                    //a report rule was performed and 
+                    //did not return "stop":
+                    skip_lib_report = true
+                }
+            }
+
         }
+        //###############
+    }
+
+    function perform_rule(rule, action) {
+        if (rule.text) {
+            say_rule_text_block(rule, rule.text)
+        }
+        if (rule.run) {
+            set_convenience_globals_from_action(action)
+            let result = rule.run(action.verb,
+                    action.noun, action, rule)
+            return {
+                run_result: result,
+            }
+        }
+        return {} //sic
+    }
+
+
+
+    function create_action_from_action_string(str) {
+        //currently only "verb thing" is allowed.
+        //eventually there might be more options for creating an action
+        if (!isString(str)) return {error: true, msg: `Invalid action string: not a string`}
+        let p = str.split(" ").map(n => n.trim()).filter( n => n)
+        let verb_id = p[0]
+        let thing_id = p[1]
+        if (p.length !== 2) {
+            return {
+                error: true,
+                msg: `Invalid action string: ${str}`,
+            }
+        }
+        let action_obj = new Action(verb_id, thing_id)
+        if (action_obj.invalid_verb) {
+            return {
+                error: true,
+                msg: `Invalid verb: '${verb_id}'`,
+            }
+        }
+        if (action_obj.invalid_thing) {
+            return {
+                error: true,
+                msg: `Invalid thing: '${thing_id}'`,
+            }
+        }
+        return action_obj
+    }
+
+    function restart_story() {
+        //todo
+        return true
+    }
+
+    function get_state() {
+        let state = {
+            is_world_manager_state: true,
+        }
+        //todo
+        return state
+    }
     
-        function get_state() {
-            let state = {
-                is_world_manager_state: true,
-            }
-            //todo
-            return state
+    
+    function set_state(state) {
+        if (!state.is_world_manager_state) {
+            throw `set_state: Not a valid world manager state.`
+            return false
         }
-        
-        
-        function set_state(state) {
-            if (!state.is_world_manager_state) {
-                throw `set_state: Not a valid world manager state.`
-                return false
+        //todo
+        return true
+    }
+
+
+//#################################
+
+//#################################
+
+//#################################
+
+//#################################
+
+//#################################
+
+//#################################
+
+//#################################
+
+//#################################
+
+//#################################
+
+
+    function say_rule_text_block(rule, txt) {
+        say (txt)
+    }
+
+    function say(txt) {
+
+
+        console.log("SAYING", txt)
+
+        process_complex_text_block(txt)
+
+        return
+    }
+
+
+
+
+    class Stream {
+        constructor(id, dom_selector) {
+            if (streams[id]) {
+                throw `A stream with id ${id} exists already!`
+                return
             }
-            //todo
-            return true
+            streams[id] = this
+            this.dom_selector = dom_selector
+            this.id = id
+            this.content = []
         }
+        set_as_current() {
+            current_stream = this
+        }
+        flush() {
+            this.content = []
+            callbacks.on_stream_flushed(this)
+        }
+        /*
+        get_content() {
+            return this.content
+        }
+        set_content(v) {
+            this.content = v
+        }
+        */
+        add_content(item) {
+            //stream wird richtig gepasst, aber item = undefined wird draufgehauen
+            this.content.push(item)
+            callbacks.on_stream_receives_new_content(this, item)
+        }
+    }
+    
+    let streams = {}
+    let current_stream = false
+    create_stream("main")
+    set_stream("main")
+
+
+    function create_stream(id) {
+        let stream = new Stream(id, "#" + id)
+        return stream
+    }
+
+    function set_stream(id) {
+        let stream = streams[id]
+        if (!stream) throw `No stream with id: '${id}' exists.`
+        stream.set_as_current()
+    }
 
 
 
-
-        function process_complex_text_block(str) {
-            /* Takes string: text that was sent to "say" by user, either
-            implicitly via a rule's text block or explicitly via
-            the global say command, or again implicitly by defining text inside
-            a weave block.
-            Returns error object or object containing optional
-            meta information and (most importantly)
-            a string containing valid HTML ready to be injected into the page.
-            This may cause side-effects like variable setting, if the text contains
-            such instructions. The say command should only care about its
-            return value, though.
-            This is supposed to be run at runtime and re-run on each new text block
-            output. So the same input won't necessarily yield same or
-            even reproducible results (because of potential random functions
-            inside the text).
-            */
-            let segs = split_string_into_segments(str)
-            if (segs.error) return segs
-            let out = ""
-            let data = []
-            segs.forEach(
-                seg => {
-                    if (seg.type === "((") {
-                        let res = convert_link_text_to_html(seg.text)
-                        if (res.error) return res
-                        out += res.html
-                        if (res.data) {
-                            data.push(res.data)
-                        }
-                    } else if (seg.type === "normal") {
-                        out += seg.text
-                    } else {
-                        //for now don't do anything special with {} and [] blocks
-                        out += seg.text
-                    }
+    function process_complex_text_block(str) {
+        /* Takes string: text that was sent to "say" by user, either
+        implicitly via a rule's text block or explicitly via
+        the global say command, or again implicitly by defining text inside
+        a weave block.
+        This manipulates current_stream object directly.
+        This may cause side-effects like variable setting, if the text contains
+        such instructions.
+        This is supposed to be run at runtime and re-run on each new text block
+        output. So the same input won't necessarily yield same or
+        even reproducible results (because of potential random functions
+        inside the text). */
+        let segs = split_string_into_segments(str)
+        console.log("SEGMENTS", segs)
+        if (segs.error) return segs
+        for (let seg of segs) {
+            console.log("SEGMENT", seg)
+            let item = {}
+            if (seg.type === "{") {
+                //ignore for now
+                item.type = "ignore"
+            } else if (seg.type === "[") {
+                //ignore for now
+                item.type = "ignore"
+            } else if (seg.type === "((") {
+                item.type = "link"
+                item.content = create_stream_link(seg.text)
+                if (item.content.error) {
+                    throw `I tried to process the text block, but I found an error. ` +
+                        item.content.msg 
                 }
-            )
-            return {
-                html: out,
-                error: false,
-                data: data,
-            }
-        }
-
-        function convert_link_text_to_html(txt) {
-            let parts = txt.split("*").map(n => n.trim()).filter(n => n)
-            let html = ""
-            let data = {
-                mentioned_linked_things: [], //things that got a link
-            }
-            let text = parts[0]
-            let id = parts[1]
-            if (parts.length === 1) id = parts[0].trim().toLowerCase()
-            let thing = get_thing_by_id(id)
-            if (!thing) {
-                return {
-                    error: true,
-                    msg: `Link '${txt}': '${id}' is not a valid thing id.`,
+            } else if (seg.type === "normal") {
+                item.type = "html"
+                item.content = {
+                    text: seg.text
                 }
-            }
-            data.mentioned_linked_things.push(thing)
-            if (settings.accessibility_links_as_links) {
-                html = `<a href="#" class="msn-link msn-link-for-thing
-                    msn-link-as-link" data-thing-id="${id}">${txt}</a>`
+                console.log("html item", item)
             } else {
-                html = `<span class="msn-link msn-link-for-thing
-                    msn-link-as-span" data-thing-id="${id}">${txt}</span>`
+                throw `Unknown segment type: '${seg.type}'. Developer mistake.`
             }
+            current_stream.add_content(item)
+        }
+    }
+
+    function create_stream_link(txt) {
+        //abstract representation of a link inside a stream
+        let parts = txt.split("*").map(n => n.trim()).filter(n => n)
+        let text = parts[0]
+        let id = parts[1]
+        if (parts.length === 1) id = parts[0].trim().toLowerCase()
+        let thing = get_thing_by_id(id)
+        if (!thing) {
             return {
-                html: html,
-                data: data,
-                error: false,
+                error: true,
+                msg: `Link '${txt}': '${id}' is not a valid thing id.`,
             }
         }
-
-
-        function split_string_into_segments(str) {
-            /* takes string, returns parsed result.
-            splits into segments by {} [] and (())
-            does not support nesting.*/
-
-            //adding more segments should be rather easy,
-            //just change this config object:
-            let config = {
-                "{": {type: "{", state: "start"},
-                "}": {type: "{", state: "end"},
-                "[": {type: "[", state: "start"},
-                "]": {type: "[", state: "end"},
-                "(": {type: "((", next: "(", state: "start"},
-                ")": {type: "((", next: ")", state: "end"},
-            }
-            let i = -1
-            let inside = "normal"
-            let out = []
-            let mark = 0
-            for (let char of str) {
-                i++
-                let next = str.substr(i + 1, 1)
-                let v = config[char]
-                if (v && (!v.next || v.next === next) ) {
-                    if (v.state === "start") {
-                        if (inside !== "normal") {
-                            let ctx = str.substr(i - 10, 20)
-                            return {
-                                error: true,
-                                msg: `Inside a '${inside}'-segment I found a ${v.type}-segment, but
-                                    nesting is not allowed here. Column: ${i}, Context: ${ctx}`,
-                                col: i,
-                            }
-                        }
-                        let piece = str.substring(mark, i)
-                        mark = i
-                        out.push({
-                            text: piece,
-                            type: inside,
-                        })
-                        inside = v.type
-                    } else {
-                        if (inside !== v.type) {
-                            let ctx = str.substr(i - 10, 20)
-                            return {
-                                error: true,
-                                msg: `I found '${char}', but there was no such segment
-                                    to close. Column: ${i}, Context: ${ctx}`,
-                                col: i,
-                            }
-                        }
-                        let piece = str.substring(mark, i)
-                        mark = i
-                        out.push({
-                            text: piece.replace(v.type, ""),
-                            type: inside,
-                        })
-                        inside = "normal"
-                    }
-                }
-            }
-            if (inside !== "normal") {
-                return {
-                    error: true,
-                    msg: `Unclosed segment.`,
-                }
-            }
-            return out
-        }
-
-
-
         return {
-            //initialization:
-            load_block,
-            set_global_hooks,
-
-            //after initialization:
-            take_turn,
-            restart_story,
-            get_state,
-            set_state,
-            get_suggestions_by_thing,
-            set_settings_option,
-
-            //test/debug:
-            log_load_info,
-            test_stuff,
-
-            
-            
+            text: text,
+            thing_id: id,
+            error: false,
         }
+    }
+
+    function split_string_into_segments(str) {
+        /* takes string, returns parsed result.
+        splits into segments by {} [] and (())
+        does not support nesting.*/
+
+        //adding more segments should be rather easy,
+        //just change this config object:
+        let config = {
+            "{": {type: "{", state: "start"},
+            "}": {type: "{", state: "end"},
+            "[": {type: "[", state: "start"},
+            "]": {type: "[", state: "end"},
+            "(": {type: "((", next: "(", state: "start"},
+            ")": {type: "((", next: ")", state: "end"},
+        }
+        let i = -1
+        let inside = "normal"
+        let out = []
+        let mark = 0
+        for (let char of str) {
+            i++
+            let next = str.substr(i + 1, 1)
+            let v = config[char]
+            if ( v && (!v.next || v.next === next) ) {
+                if (v.state === "start") {
+                    if (inside !== "normal") {
+                        let ctx = str.substr(i - 10, 20)
+                        return {
+                            error: true,
+                            msg: `Inside a '${inside}'-segment I found a ${v.type}-segment, but
+                                nesting is not allowed here. Column: ${i}, Context: ${ctx}`,
+                            col: i,
+                        }
+                    }
+                    let piece = str.substring(mark, i)
+                    mark = i
+                    out.push({
+                        text: piece,
+                        type: inside,
+                    })
+                    inside = v.type
+                } else {
+                    if (inside !== v.type) {
+                        let ctx = str.substr(i - 10, 20)
+                        return {
+                            error: true,
+                            msg: `I found '${char}', but there was no such segment
+                                to close. Column: ${i}, Context: ${ctx}`,
+                            col: i,
+                        }
+                    }
+                    let piece = str.substring(mark, i)
+                    let offset = 0
+                    if (v.next) offset = 1
+                    mark = i + 1 + offset
+                    out.push({
+                        text: piece.replace(v.type, ""),
+                        type: inside,
+                    })
+                    inside = "normal"
+                }
+            } else if (i === str.length - 1) {
+                out.push({
+                    text: str.substring(mark, i + 1),
+                    type: inside,
+                })
+            }
+        }
+        if (inside !== "normal") {
+            return {
+                error: true,
+                msg: `Unclosed segment.`,
+            }
+        }
+        //additional check. remove later:
+        let test = ""
+        for (let item of out) {
+            if (item.type === "normal") test+=item.text
+            if (item.type === "((") test+="(("+item.text+"))"
+            if (item.type === "[") test+="["+item.text+"]"
+            if (item.type === "{") test+="{"+item.text+"}"
+        }
+        if (test !== str) {
+            throw `Wrong segmentation. Developer mistake.`
+        }
+        return out
+    }
+
+
+
+
+    /*
+    function convert_link_text_to_html(txt) {
+        let parts = txt.split("*").map(n => n.trim()).filter(n => n)
+        let html = ""
+        let data = {
+            mentioned_linked_things: [], //things that got a link
+        }
+        let text = parts[0]
+        let id = parts[1]
+        if (parts.length === 1) id = parts[0].trim().toLowerCase()
+        let thing = get_thing_by_id(id)
+        if (!thing) {
+            return {
+                error: true,
+                msg: `Link '${txt}': '${id}' is not a valid thing id.`,
+            }
+        }
+        data.mentioned_linked_things.push(thing)
+        if (settings.accessibility_links_as_links) {
+            html = `<a href="#" class="msn-link msn-link-for-thing
+                msn-link-as-link" data-thing-id="${id}">${txt}</a>`
+        } else {
+            html = `<span class="msn-link msn-link-for-thing
+                msn-link-as-span" data-thing-id="${id}">${txt}</span>`
+        }
+        return {
+            html: html,
+            data: data,
+            error: false,
+        }
+    }
+*/
+
+    let callbacks = false
+
+    function set_callbacks(cb) {
+        callbacks = cb
+    }
+
+
+
+    return {
+        //initialization:
+        load_block,
+        set_global_hooks,
+        set_callbacks,
+
+        //after initialization:
+        take_turn,
+        restart_story,
+        get_state,
+        set_state,
+        get_suggestions_by_thing,
+
+        //after initialization, for user:
+        set_settings_option,
+        create_stream,
+        set_stream,
+
+        //test/debug:
+        log_load_info,
+
+
+        
+    }
 
 })()
 

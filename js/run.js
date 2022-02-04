@@ -1183,17 +1183,6 @@ function click_reload() {
     generate_the_story()
 }
 
-function escape_html(n) {
-    let l = {
-        '&': "&amp;",
-        '"': "&quot;",
-        '\'': "&apos;",
-        '<': "&lt;",
-        '>': "&gt;"
-    };
-    return n.replace( /[&"'<>]/g, n => l[n] )
-}
-
 
 
 function click_debug() {

@@ -1,4 +1,16 @@
 
+function escape_html(n) {
+    let l = {
+        '&': "&amp;",
+        '"': "&quot;",
+        '\'': "&apos;",
+        '<': "&lt;",
+        '>': "&gt;"
+    };
+    return n.replace( /[&"'<>]/g, n => l[n] )
+}
+
+
 
 //type checks:
 ;['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'].forEach(

@@ -1,10 +1,16 @@
 
 
 
+
 function escape_html(n) {
-    return n
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;") //ampersand first!
+    let l = {
+        '&': "&amp;", //ampersand first is important!
+        '"': "&quot;",
+        '\'': "&apos;",
+        '<': "&lt;",
+        '>': "&gt;"
+    };
+    return n.replace( /[&"'<>]/g, n => l[n] )
 }
 
 

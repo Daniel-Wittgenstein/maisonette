@@ -3,6 +3,7 @@
 /* 
 todo to do:
 
+- two run blocks after the other are allowed. shouldn't be, though
 
 - bring back var definitions to the transpiler. it makes way
 more sense.
