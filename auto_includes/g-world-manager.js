@@ -97,10 +97,17 @@ world_manager = (function() {
             let parts = args[0].split(" ").map(n => n.trim()).filter(n => n)
             let name = parts[0]
             asset_data[type][name] = `msn-asset-${type}-${name}`
-
-
         } else if (type === "t") {
+            let p = args[0].split(" ").map(n => n.trim()).filter(n => n)
+            if (p.length !== 1) {
+                return {
+                    error: true,
+                    msg: `I expected exactly one word specifying the thing's id.`
+                }
+            }
             let id = args[0]
+            let res = validate_thing_id(id)
+            if (res.error) return res 
             let thing = args[1]
             if (things[id]) {
                 return {
@@ -223,6 +230,36 @@ world_manager = (function() {
     console.log(r)
     console.log("--------------------------")
 */
+
+
+    function validate_thing_id(id) {
+        /* This does NOT force the id to only consist
+        of certain characters, because we want to allow
+        more characters than just the standard Latin ones.
+        Instead it disallows certain characters that would
+        certainly (apostrophes) or that just *might* crash the app.
+        Underscore is allowed, of course. */
+        let forbidden = ['"', "'", "`", ".", ",", ";", ":",
+            "-", "+", "*", "/", "\\", "!", "?", "§", "$", "%"
+            , "&", "(", ")", "[", "]", "{", "}", "#", "~"
+            , "^", "°", "@", "|", "¶", "¡", "¿",
+            "‐", "‑", "–", "—",  "―", //evil stuff that looks like a minus but is not 
+            , "“", "”", "⁈", "⁉", "⁇",
+            , "<", ">", "¦"]
+        let forbid = new Set(forbidden)
+        let i = -1
+        for (let char of id) {
+            i++
+            if ( forbid.has(char) ) return {
+                error: true,
+                msg: `The character ${char} is not allowed inside a thing's id. You can only use
+                letters, numbers and the underscore (_) character.`,
+                col_nr: i,
+            }
+        }
+        return {error: false}
+    }
+
 
     function preprocess_rule(rule) {
         //input: # rule take bottle (stop) #multi #mine

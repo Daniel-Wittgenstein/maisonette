@@ -9,7 +9,7 @@ is_verb: true,
 #thing drink
 is_verb: yes,
 
-#thing take"
+#thing take
 is_verb: yes
 
 
@@ -34,8 +34,6 @@ return carry_on
 
 #rule eat * (after)
 It tasted rather bad.
-
-
 
 
 
