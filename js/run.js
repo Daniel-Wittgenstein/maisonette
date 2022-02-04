@@ -88,6 +88,12 @@ if (DEBUG) {
     })
     
 
+    path = './app/js/test-tools'
+    fs.watch(path, function() {
+        if (location) location.reload()
+    })
+    
+
 
 }
 
@@ -977,14 +983,6 @@ function hide_editor() {
     settings.show_editor = false
 }
 
-function is_valid_proj_name(n) {
-    let chars = ["/", ".", "\\", "'", '"'] //the " and ' are the most relevant here,
-        //because they would mess up our naive html inclusion. 
-    for (let item of chars) {
-        if (n.includes(item)) return false
-    }
-    return true
-}
 
 function create_project(name) {
     //fish fishy
@@ -1184,11 +1182,17 @@ function click_reload() {
 }
 
 
-
 function click_debug() {
     /* show dev tools only for iframe (doesn't seem to work, though */
     let elxx = document.getElementById('preview-iframe')
     let win = nw.Window.get()
     win.showDevTools(elxx)
 }
+
+let nw_clipboard = nw.Clipboard.get()
+
+function set_clipboard(txt) {
+    nw_clipboard.set(txt, 'text')
+}
+
 

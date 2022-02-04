@@ -26,3 +26,8 @@ function rnd(min, max) {
     max = Math.floor(max)
     return Math.floor( Math.random() * (max - min + 1) ) + min
 }
+
+
+function one_of(arr) {
+    return arr[rnd(0, arr.length-1)]
+}

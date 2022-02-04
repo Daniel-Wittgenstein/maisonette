@@ -279,7 +279,7 @@ const stop = "stop"
 
 
         //test:
-        world_manager.take_turn("eat sandwich")
+        //world_manager.take_turn("eat sandwich")
 
 
     })

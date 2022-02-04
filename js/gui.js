@@ -73,12 +73,15 @@ gui_window_manager = (function() {
         }
     }
 
+    
+
 
 
     function open_new_project_window(callback) {
+        //var reg_ex_validator = new RegExp("^[a-z0-9_-]+$", "i");
         let title = `Create a new project`
         let main = `Name for the new project:<br><br>
-        (only latin letters, numbers and underscore are allowed)
+        (some characters are not allowed in the name)
         <br><br>
         <input class="new-prj-input" type="text">`
         let win = new GuiWindow(title, main, "", (gui_window) => {
@@ -86,7 +89,7 @@ gui_window_manager = (function() {
             $(".new-prj-input").on("keydown", (e) => {
                 setTimeout( () => {
                     let v =  $(".new-prj-input").val()
-                    if ( /^[a-z0-9_]+$/i.test(v) ) {
+                    if ( is_valid_proj_name(v) ) {
                         $(".new-prj-input").removeClass("invalid")
                     } else {
                         $(".new-prj-input").addClass("invalid")
@@ -94,7 +97,7 @@ gui_window_manager = (function() {
                 }, 50)
                 if (e.key === "Enter") {
                     let v = $(".new-prj-input").val()
-                    if (/^[a-z0-9_]+$/i.test(v)) {
+                    if ( is_valid_proj_name(v) ) {
                         callback(v)
                         gui_window.close_window()
                     } else {
@@ -117,6 +120,21 @@ gui_window_manager = (function() {
             "", ((gui_win) => {
             populate_open_project_window(gui_win, r, callback)
         }))
+    }
+
+
+    function is_valid_proj_name(n) {
+        if (!n || n.length === 0) return false
+        let chars = [
+                "/", ".", "\\", "'", '"',
+                "<", ">", ":", "|", "?", "*", " "
+            ] //the apostrophe (') might mess up our naive html inclusion.
+            //the other characters are partly or entirely forbidden
+            //on some OSes.
+        for (let item of chars) {
+            if (n.includes(item)) return false
+        }
+        return true
     }
 
 
