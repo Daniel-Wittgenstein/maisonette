@@ -1,0 +1,197 @@
+
+:root {
+    --main-bg: #FFF;
+    --main-fg: #222;
+    --border-color: #CCC;
+    --image-border-color: #AAA;
+    --box-top-bg: rgb(0, 162, 255);
+    --box-top-fg: white;
+    --box-bottom-bg: rgb(0, 162, 255);
+    --box-bottom-fg: white;
+
+    --image-border-size: 8px;
+    --image-radius: 50%;
+
+    --page-max-width: 1200px;
+    --image-panel-display: flex; /* must be flex or none */
+    --left-col-width: 1fr;
+    --center-col-width: 1.8fr;
+    --right-col-width: 1fr;
+    --left-col-display: block; /* must be block or none */
+    --right-col-display: block; /* must be block or none */
+    --center-top-height: 50%;
+    --center-bottom-height: 50%;
+    --display-center-top: block; /* must be block or none */
+    --center-gap-height: 1rem;
+}
+
+
+
+
+.box-bottom {
+    background-color: var(--box-bottom-bg);
+    color: var(--box-bottom-fg);
+
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+div {
+    border: 0px solid black;
+    background: var(--main-bg);
+    color: var(--main-fg);    
+}
+
+
+body {
+    margin: 0px;
+    padding: 0px;
+    font-size: 1rem;
+    font-family: sans-serif;
+}
+
+.app {
+    width: 100vw; 
+    height: calc(100vh);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    display: grid; 
+    grid-template-columns: var(--left-col-width) var(--center-col-width) var(--right-col-width); 
+    grid-template-rows: auto 1fr auto; 
+    gap: 0px 0px; 
+    grid-template-areas: 
+      "box-top box-top box-top"
+      "box-left box-center box-right"
+      "box-bottom box-bottom box-bottom";
+      width: 100vw; 
+      height: calc(100vh);
+      max-width: var(--page-max-width);
+  }
+
+
+.box-top { 
+    grid-area: box-top;
+    max-height: 45vh;
+    overflow: hidden;
+    border-bottom: 1px var(--border-color) solid;
+}
+
+.box-bottom { 
+    grid-area: box-bottom;
+    max-height: 45vh;
+    overflow: hidden;
+    border-top: 1px var(--border-color) solid;
+}
+
+.box-left { 
+    display: var(--left-col-display);
+    grid-area: box-left;
+    border-right: 1px var(--border-color) solid;
+}
+
+.box-center {
+    grid-area: box-center;
+
+}
+
+.box-right { 
+    display: var(--right-col-display);
+    grid-area: box-right; 
+    border-left: 1px var(--border-color) solid;
+}
+
+
+.holder {
+    overflow: auto;
+}
+
+.box-top, .box-bottom {
+    padding: 0.65rem;
+    line-height: 1.5rem;
+    max-height: 4rem;
+    overflow: hidden;
+    text-align: center;
+    color: white;
+}
+
+.box-top {
+    background-color: var(--box-top-bg);
+    color: var(--box-top-fg);
+}
+
+.box-bottom {
+    background-color: var(--box-bottom-bg);
+    color: var(--box-bottom-fg);
+}
+
+.box-left, .box-right {
+    padding: 1rem;
+    padding-top: 1.5rem;
+    line-height: 1.5rem;
+}
+
+.box-right {
+    padding: 1.5rem;
+}
+
+.box-center {
+    text-indent: 1rem;
+    overflow: hidden;
+    padding: 0rem;
+    line-height: 1.5rem;
+}
+
+.center-top {
+    display: var(--display-center-top);
+    height: calc(var(--center-top-height) - var(--center-gap-height));
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--center-gap-height);
+}
+
+.center-bottom {
+    height: calc(var(--center-bottom-height));
+}
+
+.center-top, .center-bottom {
+    overflow: auto;
+    padding: 1.5rem;
+}
+
+.square-wrapper {
+    display: var(--image-panel-display);
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.square {
+    /* This is a hack to set the height
+    of the div relative to its width and make a
+    square: (100% * 100% would be perfect square,
+    but making height a bit smaller actually looks
+    better) */
+    height:0;
+    width:100%;
+    padding-bottom: 90%;
+    background-color:#CCC;
+    overflow: hidden;
+    border-radius: var(--image-radius);
+    border: var(--image-border-size) solid var(--image-border-color);
+}
+
+.panel-image {
+    width: 100%;
+    height: auto;
+}
+
+/*.box-right-text-box {
+}
+
+*/

@@ -1,0 +1,25 @@
+
+/* This stylesheet is only loaded once the user sets scrollbar color.
+If not, it is never loaded and scrollbars stay default. */
+
+    /* firefox: */
+* {
+    scrollbar-color: var(--scroll-bar-fg) var(--scroll-bar-bg);
+}
+ 
+    /* webkit browsers:
+    just setting the background and foreground color on Chrome is awful,
+    so we set some other things, too
+    
+    */
+::-webkit-scrollbar {
+    width: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    background: var(--scroll-bar-bg);
+}
+ 
+::-webkit-scrollbar-thumb {
+    background: var(--scroll-bar-fg);
+}

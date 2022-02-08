@@ -9,8 +9,6 @@ to do:
 
 - clean up ./temp folder on app exit (or better: on app start)
 
-
-
 */
 
 $(window).on("load", start)
