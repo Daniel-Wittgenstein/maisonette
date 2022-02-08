@@ -36,9 +36,9 @@ function start() {
 
 }
 
-function set_root_font_size(px) {
-    let root = document.querySelector(":root");
-    root.style.fontSize = px + "px";
+function set_root_font_size(v) {
+    let root = document.querySelector(":root")
+    root.style.fontSize = v
 }
 
 function set_css_var(v, prop) {
@@ -184,7 +184,6 @@ let funcs = {
 
 
     },
-
 
     set_root_font_size: set_root_font_size,
 }

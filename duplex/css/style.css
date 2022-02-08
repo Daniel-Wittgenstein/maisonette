@@ -23,6 +23,8 @@
     --center-bottom-height: 50%;
     --display-center-top: block; /* must be block or none */
     --center-gap-height: 1rem;
+
+    font-size: 0.875rem;
 }
 
 

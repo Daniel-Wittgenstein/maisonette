@@ -171,3 +171,21 @@ Styles:
 
 ***
 
+name: duplex.set_root_font_size
+example: duplex.set_root_font_size("0.5rem")
+what it does: scales all text on the page up or down
+
+parameters:
+1. new size of the root font. Use "rem" units.
+
+Note: The default root font size set by Duplex is "0.875rem", which should translate to "14px" on most browsers. If, for example, you call 'duplex.set_root_font_size("1.0rem")' the font size will go up to 16 pixels.
+
+Note: This should only be called once at the beginning of the game. Don't call this
+during the game or it will interfere with accessibility settings.
+
+Note: This is different than a browser's zoom feature, because it just scales
+the text, not the entire page layout.
+
+***
+
+
