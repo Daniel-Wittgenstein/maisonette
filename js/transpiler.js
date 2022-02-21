@@ -3,10 +3,10 @@
 /* 
 todo to do:
 
-- two run blocks after the other are allowed. shouldn't be, though
+- two run blocks in direct succession are allowed. shouldn't be, though
 
 - bring back var definitions to the transpiler. it makes way
-more sense.
+more sense. (is this still a thing?)
 
 - cache entries must expire
 by timestamp, otherwise cache
@@ -87,6 +87,8 @@ maisonette_transpiler = (function() {
         "option": "option",
         "thing": "thing",
         "t": "thing",
+        "room": "room",
+        "js": "js",
         "script": "js",
         "function": "function",
         "video": "video",
@@ -97,6 +99,9 @@ maisonette_transpiler = (function() {
         "meta": "meta",
         "relation": "relation",
         "comment": "comment",
+
+        "add": "add",
+
     }
 
     const block_definitions = {
@@ -130,6 +135,12 @@ maisonette_transpiler = (function() {
             transpiled_key: "t",
         },
 
+        "room": {
+            block_type: "props",
+            name: "room",
+            transpiled_key: "rm",
+        },
+
         //#######################
 
         "rule": {
@@ -148,7 +159,7 @@ maisonette_transpiler = (function() {
                 //we do not auto-create globals anymore.
                 //instead the world_manager creates them
                 //once it is instructed by the io-manager
-                //to do so.
+                //to do so. (todo: to do change that back)
                 return ""
             }
         },
@@ -202,6 +213,13 @@ maisonette_transpiler = (function() {
             multi_line_allowed: true,
             censor: true, //remove comment text from final output.
         },
+
+        "add": {
+            block_type: "simplex",
+            name: "add",
+            transpiled_key: "add",
+            multi_line_allowed: false,
+        }, //todo to do: implement
 
     }
 

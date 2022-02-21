@@ -11,7 +11,13 @@ to do:
 
 */
 
-$(window).on("load", start)
+$(window).on("load", () => {
+    if (!is_nw_js()) {
+        $(".inside-browser").show()
+        return
+    }
+    start()
+})
 
 
 const zoom_levels_to_px = [
@@ -90,10 +96,8 @@ if (DEBUG) {
     fs.watch(path, function() {
         if (location) location.reload()
     })
-    
-
-
 }
+
 
 let time_transpilation = []
 
@@ -106,7 +110,11 @@ function generate_the_story(mode = "test") {
     let elapsed = time - last_update
     last_update = time
     //console.log(elapsed)
-    if (elapsed <= 50) return
+    if (elapsed <= 1000) {
+        //better to be on the safe side
+        alert("Still working ... You are saving / exporting too fast.")
+        return
+    }
     //console.log("ok")
     if (!chosen_dir) return
     time_transpilation.start = + new Date()
@@ -423,8 +431,6 @@ function start_processing(result) {
     
     hide_error_box()
 
-    //xyzzy plugh
-
     if (!chosen_dir) {
         alert("No chosen directory.")
         return
@@ -457,26 +463,12 @@ function start_processing(result) {
             }
         )
     }
-    
-    //console.log("ready to build html page?", transpiled_js_files,
-    //   collector, html_template_content)
 
-    //console.log(transpiled_js)
-    //debug_test_eval_transpiled_js(transpiled_js)
 
-    //temporarily generated index.html resides in nw/temp (not in directory 'app')
+    //Note: temporarily generated index.html resides in nw/temp (not in directory 'app')
     
     /*
-    for test-playing:
-    auto_includes_path = ../app/auto_includes
-    user_path = ../app/projects/${user-project}/
-    asset_path = ../app/projects/${user-project}/assets
-
-    for exporting:
-    auto_includes_path: ./app/auto
-    user_path: ./app/user
-    asset_path = ./app/assets
-
+    Note:
     (For exporting, it would be tempting to use only one directory for both
     auto_includes_path and user_path, but then there might be name conflicts, of course,
     if the user has a file named, say, script.js and the auto_includes_path does too.
@@ -528,7 +520,14 @@ function start_processing(result) {
         fs.mkdirSync("./temp")
     }
 
-    fs.writeFileSync( "./temp/index.html", html, {encoding: 'utf8'} )
+    try {
+        fs.writeFileSync( "./temp/index.html", html, {encoding: 'utf8'} )
+    } catch(e) {
+        console.log("error: ", e)
+        alert("Fatal error: could not write ./temp/index.html: " + e)
+        return
+    }
+
 
     //write all transpiled files to disk as js files into folder "temp":
     for ( let key of Object.keys(transpiled_js_files) ) {
@@ -547,6 +546,9 @@ function start_processing(result) {
 
     let el = document.getElementById('preview-iframe')
     el.src = "../temp/index.html"
+
+
+
     return true
 
     //window.location.href = "/index-temp.html"
@@ -749,6 +751,40 @@ function zoom_to(level) {
 function set_css_var(css_var, val) {
     document.documentElement.style.setProperty('--' + css_var, val)
 }
+
+
+function click_tab(tab) {
+    $(".tab").addClass("unslctd")
+    $("#tab-"+tab).removeClass("unslctd")
+
+    $(".tab-box").hide()
+    $(".tab-box-"+tab).show()
+    
+    if (tab === "help") {
+        let h = $(".tab-box-help").first().html().trim()
+        if (h === "") {
+            //set help contents for the first time
+            //we don't do this on startup to potentially
+            //save a bit of time on startup
+            init_help_box()
+        }
+    }
+}
+    
+function init_help_box() {
+    let html = markdown_to_html(msn_help_contents)
+    $(".tab-box-help").html(html)
+    help_processor.do($(".tab-box-help"))
+}
+
+
+function markdown_to_html(md) {
+    let html
+    let converter = new showdown.Converter()
+    html = converter.makeHtml(md)
+    return html
+}
+
 /*
 function make_error_box_big() {
     //no matter whether settings.show_console is true or not,
@@ -942,6 +978,21 @@ function start() {
     init_keyboard_shortcuts()
 
     generate_the_story()
+
+    
+    if (DEBUG) {
+        let win = nw.Window.get()
+        win.showDevTools()
+        win.width = window.screen.width
+        win.height = Math.round(window.screen.height * 0.57)
+        win.moveTo(0, 0)
+        /* This is broken, but nw.js is just broken in this regard.
+        It always does what the heck it wants when it comes
+        to window positions. */ 
+    }
+    
+            init_help_box() //testing only
+
 }
 
 function init_keyboard_shortcuts() {
@@ -1181,7 +1232,7 @@ function click_reload() {
 
 
 function click_debug() {
-    /* show dev tools only for iframe (doesn't seem to work, though */
+    /* show dev tools only for iframe (doesn't seem to work, though?)*/
     let elxx = document.getElementById('preview-iframe')
     let win = nw.Window.get()
     win.showDevTools(elxx)

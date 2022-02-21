@@ -1,0 +1,15 @@
+ /* Dropdown Button */
+ 
+ 
+ :root {
+  --dropdown-bg: #FFF;  
+  --dropdown-upper-link-color: rgb(3, 109, 170);
+  --dropdown-upper-link-color-hover: rgb(0, 43, 68);
+  --dropdown-link-color: #FFF;
+  --dropdown-bg: rgba(0,0,0, 0.85);
+  --dropdown-separator-border-color: #666;
+  --selected-color-fg: #222;
+  --selected-color-bg: #ddd;
+  
+
+ }

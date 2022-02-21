@@ -1,4 +1,14 @@
 
+function is_nw_js(){
+    try {
+        return ( typeof require('nw.gui') !== "undefined" )
+    } catch (e) {
+        return false
+    }
+}
+
+
+
 function escape_html(n) {
     let l = {
         '&': "&amp;",

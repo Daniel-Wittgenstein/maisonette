@@ -1,0 +1,17 @@
+
+
+
+.tab-box-help {
+    background: var(--bg_col);
+    color: var(--fg_col);
+    padding: 20px;
+    font-family: sans-serif;
+}
+
+.code-box {
+    border: 1px solid var(--fg_col);
+    border-radius: 4px;
+    padding: 14px;
+    font-family: monospace;
+}
+

@@ -438,7 +438,7 @@ world_manager = (function() {
 
         
     function get_suggestions_by_thing(thing_id) {
-        //THIS FUNCTION IS EXPORTED
+        //THIS FUNCTION IS NOT EXPORTED ANYMORE
         /*
             should return an array containing object entries as such:
             {
@@ -446,11 +446,24 @@ world_manager = (function() {
                 display_priority: 42,
                 custom_text: false, //or string: "some custom string"
             }
-    
         */
         //get verb list from get_verbs_for_thing_id:
         let lst = get_verbs_for_thing_id(thing_id)
         if (lst.length === 0) return []
+        lst = lst.map (n => {
+            if (!n.custom_text) {
+                let verb = get_thing_by_id(n.verb)
+                if (!verb) throw `Verb with id '${n.verb}' does not exist.`
+                if (verb.suggestion_text) {
+                    n.custom_text = verb.suggestion_text
+                } else if (verb.name) {
+                    n.custom_text = verb.name
+                } else {
+                    n.custom_text = verb.id
+                }
+            }
+            return n
+        })
         //sort by display_priority:
         lst = lst.sort( (a, b) => {
             return b.display_priority - a.display_priority //or viceversa. test
@@ -490,7 +503,6 @@ world_manager = (function() {
             //thing appears:
         let spec_rules_list = get_specific_applying_rules_by_thing_id(thing_id)
 
-        console.log("spec", spec_rules_list)
 
         //2. now we have all the specific rules, but we have to create a verb
         //list out of that:
@@ -566,7 +578,7 @@ world_manager = (function() {
 
 
     function get_specific_applying_rules_by_thing_id(thing_id) {
-        console.log("match table", rule_specific_match_table)
+        //console.log("match table", rule_specific_match_table)
         let specific_rules_lst = rule_specific_match_table.by_thing[thing_id]
         if (!specific_rules_lst) return []
 
@@ -590,7 +602,7 @@ world_manager = (function() {
 
 
     function check_rule_head_against_action(rule, action) {
-        console.log("reload", rule.head, action, rule)
+        //console.log("reload", rule.head, action, rule)
         let v = rule.required_verb
         let t = rule.required_thing
         return (
@@ -644,6 +656,8 @@ world_manager = (function() {
                 result = globalize_all_entities(glob)
             }
         }
+
+        glob["say"] = say
 
         return result
     }
@@ -728,8 +742,6 @@ world_manager = (function() {
                         
 
     function log_load_info() {
-        //window.onload fired, all game data has finished loading
-
 
         console.log(`%c M %c A %c I %c S %c O %c N %c E %c T %c T %c E %c WORLD MANAGER: `
             + `game data was successfully loaded. `
@@ -818,11 +830,13 @@ world_manager = (function() {
     function take_turn(action_str) {
         /* THIS FUNCTION IS EXPORTED.
         This takes an action as an action_string.
-        This way the io-manager does not have to deal
-        with action objects, it can just save actions as strings. */
-
-        console.log("take turn", action_str)
+        This way the io-manager and stream-manager do not have to deal
+        with action objects*/
+        //console.log("take turn", action_str)
         let res = take_turn_proper(action_str)
+
+        stream_manager.turn_finished()
+
         if (res.error) {
             throw "take_turn: " + res.msg
         }
@@ -835,17 +849,14 @@ world_manager = (function() {
             return action_obj
         }
 
-        //do rule cascade:
-        window.say = say //set as global for user convenience
-        do_rule_cascade(action_obj)
+        if (!action_obj.idle) {
+            do_rule_cascade(action_obj)
+        }
         
-        //todo to do: foreach
+        //todo to do: each turn
 
         return {error: false}
     }
-
-
-
 
 
     function do_rule_cascade(action_obj) {
@@ -866,20 +877,20 @@ world_manager = (function() {
             let the_rules = rules[phase_name]
             if (skip_lib_carry_out && phase_name === "lib_carry_out") continue
             if (skip_lib_report && phase_name === "lib_report") continue
-            console.log("starting the phase:", phase_name)
+            //console.log("starting the phase:", phase_name)
             if (!the_rules) continue
             for (let rule of the_rules) {
-                console.log("checking rule:", rule)
-                //not that rule_applies sets
+                //console.log("checking rule:", rule)
+                //note that rule_applies sets
                 //user convenience globals itself, no need
                 //to set them here
                 let applies = rule_applies(rule, action)
                 if (!applies) continue
 
-                console.log("rule applies")
+                //console.log("rule applies")
                 //perform rule also handles user convenience globals itself:
                 let result = perform_rule(rule, action)
-                console.log("result of performing the rule", result)
+                //console.log("result of performing the rule", result)
 
                 if ( (result.run_result === "stop")
                     || ( phase_name === "stop" &&
@@ -917,11 +928,28 @@ world_manager = (function() {
         return {} //sic
     }
 
-
-
     function create_action_from_action_string(str) {
         //currently only "verb thing" is allowed.
         //eventually there might be more options for creating an action
+
+        /* special actions: start with a percent */
+        if (str === "%begin") {
+            //story start. this should only be issued internally,
+            //when the story starts. When the story starts,
+            //the user-defined start function is run and then the engine
+            //takes a %begin turn. This is pretty much like an idle turn
+            //(see below)
+            return {error: false, idle: true}
+        }
+
+        if (str === "%idle") {
+            //special command: perform a turn, but take no action at all
+            //this is basically like waiting without a waiting text,
+            //also this action cannot fail and rules cannot override it
+            return {error: false, idle: true}
+        }
+
+
         if (!isString(str)) return {error: true, msg: `Invalid action string: not a string`}
         let p = str.split(" ").map(n => n.trim()).filter( n => n)
         let verb_id = p[0]
@@ -948,28 +976,6 @@ world_manager = (function() {
         return action_obj
     }
 
-    function restart_story() {
-        //todo
-        return true
-    }
-
-    function get_state() {
-        let state = {
-            is_world_manager_state: true,
-        }
-        //todo
-        return state
-    }
-    
-    
-    function set_state(state) {
-        if (!state.is_world_manager_state) {
-            throw `set_state: Not a valid world manager state.`
-            return false
-        }
-        //todo
-        return true
-    }
 
 
 //#################################
@@ -997,7 +1003,6 @@ world_manager = (function() {
 
     function say(txt) {
 
-
         console.log("SAYING", txt)
 
         process_complex_text_block(txt)
@@ -1005,124 +1010,95 @@ world_manager = (function() {
         return
     }
 
-
-
-
-    class Stream {
-        constructor(id, dom_selector) {
-            if (streams[id]) {
-                throw `A stream with id ${id} exists already!`
-                return
-            }
-            streams[id] = this
-            this.dom_selector = dom_selector
-            this.id = id
-            this.content = []
-        }
-        set_as_current() {
-            current_stream = this
-        }
-        flush() {
-            this.content = []
-            callbacks.on_stream_flushed(this)
-        }
-        /*
-        get_content() {
-            return this.content
-        }
-        set_content(v) {
-            this.content = v
-        }
-        */
-        add_content(item) {
-            //stream wird richtig gepasst, aber item = undefined wird draufgehauen
-            this.content.push(item)
-            callbacks.on_stream_receives_new_content(this, item)
-        }
-    }
     
-    let streams = {}
-    let current_stream = false
-    create_stream("main")
-    set_stream("main")
-
-
-    function create_stream(id) {
-        let stream = new Stream(id, "#" + id)
-        return stream
-    }
-
-    function set_stream(id) {
-        let stream = streams[id]
-        if (!stream) throw `No stream with id: '${id}' exists.`
-        stream.set_as_current()
-    }
-
-
 
     function process_complex_text_block(str) {
         /* Takes string: text that was sent to "say" by user, either
         implicitly via a rule's text block or explicitly via
         the global say command, or again implicitly by defining text inside
         a weave block.
-        This manipulates current_stream object directly.
         This may cause side-effects like variable setting, if the text contains
         such instructions.
         This is supposed to be run at runtime and re-run on each new text block
         output. So the same input won't necessarily yield same or
         even reproducible results (because of potential random functions
-        inside the text). */
+        inside the text).
+        For text output, this calls the stream_manager
+        */
         let segs = split_string_into_segments(str)
-        console.log("SEGMENTS", segs)
+        //console.log("SEGMENTS", segs)
         if (segs.error) return segs
         for (let seg of segs) {
-            console.log("SEGMENT", seg)
-            let item = {}
+            //console.log("SEGMENT", seg)
+            let item = false
             if (seg.type === "{") {
                 //ignore for now
-                item.type = "ignore"
             } else if (seg.type === "[") {
                 //ignore for now
-                item.type = "ignore"
             } else if (seg.type === "((") {
-                item.type = "link"
-                item.content = create_stream_link(seg.text)
-                if (item.content.error) {
+                item = create_link_obj(seg.text)
+                if (item.error) {
                     throw `I tried to process the text block, but I found an error. ` +
-                        item.content.msg 
+                        item.msg
                 }
             } else if (seg.type === "normal") {
-                item.type = "html"
-                item.content = {
-                    text: seg.text
+                item = create_html_obj(seg.text)
+                if (item.error) {
+                    throw `I tried to process the text block, but I found an error. ` +
+                        item.msg 
                 }
-                console.log("html item", item)
+                //console.log("html item", item)
             } else {
                 throw `Unknown segment type: '${seg.type}'. Developer mistake.`
             }
-            current_stream.add_content(item)
+            if (item) stream_manager.add_content(item)
         }
     }
 
-    function create_stream_link(txt) {
-        //abstract representation of a link inside a stream
+    function create_html_obj(txt) {
+        return {
+            type: "html",
+            text: txt,
+            is_stream_item: true,
+        }
+    }
+
+    function create_link_obj(txt) {
+        //note: parsing has to happen here, not
+        //inside the stream manager; the stream
+        //manager should only handle displaying,
+        //not logic, and links are full of logic
+        //note: we only pass the id of the
+        //thing to the stream manager.
+        //that's all the information
+        //the link needs. DO NOT pass
+        //more then necessary to the outside world
+        //especially not suggestions.
+        //suggestion texts have to be requested from
+        //the world_manager as they are needed.
+
         let parts = txt.split("*").map(n => n.trim()).filter(n => n)
         let text = parts[0]
         let id = parts[1]
         if (parts.length === 1) id = parts[0].trim().toLowerCase()
-        let thing = get_thing_by_id(id)
-        if (!thing) {
-            return {
-                error: true,
-                msg: `Link '${txt}': '${id}' is not a valid thing id.`,
+        if (id) {
+            let thing = get_thing_by_id(id)
+            if (!thing) {
+                return {
+                    error: true,
+                    msg: `Link '${txt}': '${id}' is not a valid thing id.`,
+                }
             }
         }
         return {
             text: text,
             thing_id: id,
-            error: false,
+            type: "link",
+            is_stream_item: true,
         }
     }
+
+
 
     function split_string_into_segments(str) {
         /* takes string, returns parsed result.
@@ -1212,67 +1188,78 @@ world_manager = (function() {
         return out
     }
 
+//#############
 
+    let initial_state = false
 
-
-    /*
-    function convert_link_text_to_html(txt) {
-        let parts = txt.split("*").map(n => n.trim()).filter(n => n)
-        let html = ""
-        let data = {
-            mentioned_linked_things: [], //things that got a link
-        }
-        let text = parts[0]
-        let id = parts[1]
-        if (parts.length === 1) id = parts[0].trim().toLowerCase()
-        let thing = get_thing_by_id(id)
-        if (!thing) {
-            return {
-                error: true,
-                msg: `Link '${txt}': '${id}' is not a valid thing id.`,
-            }
-        }
-        data.mentioned_linked_things.push(thing)
-        if (settings.accessibility_links_as_links) {
-            html = `<a href="#" class="msn-link msn-link-for-thing
-                msn-link-as-link" data-thing-id="${id}">${txt}</a>`
-        } else {
-            html = `<span class="msn-link msn-link-for-thing
-                msn-link-as-span" data-thing-id="${id}">${txt}</span>`
-        }
-        return {
-            html: html,
-            data: data,
-            error: false,
-        }
-    }
-*/
-
-    let callbacks = false
-
-    function set_callbacks(cb) {
-        callbacks = cb
+    function app_ready_to_play() {
+        /* This should be called from outside.
+        This tells the world_manager that the
+        initial game state is all set.
+        Now we can save the current state
+        as the initial "story starts" state.
+        Note: if the story creator does shenanigans
+        like creating things with
+        random properties at game startup, we
+        have a problem.
+        In that case clicking "reload game" mid-game and
+        actually closing the browser and reopening the page
+        may have completely different results.
+        In the former case, the things would NOT be re-randomized.
+        But we assume that the story creator either
+        does not do things like that or is advanced enough
+        to know what they are doing. (A way
+            to force re-randomizing would be to force
+            a page reload via JS.)
+        */
+        initial_state = get_state()
     }
 
+    function restart_story(after_app_init = false) {
+                //todo: rest of function
+        if (!initial_state) throw `Developer mistake: cannot
+            restart story: no valid initial_state`
+        if (!after_app_init) set_state(initial_state)
+        if (!glob["start"]) throw `Your story should have a function named 'start'.
+        This is where your story starts.`
+        glob.start()
+        take_turn("%begin")
+        return true
+    }
+
+    function get_state() {
+        let state = {
+            is_world_manager_state: true,
+        }
+        //todo
+        return state
+    }
+    
+    
+    function set_state(state) {
+        if (!state.is_world_manager_state) {
+            throw `set_state: Not a valid world manager state.`
+            return false
+        }
+        //todo
+        return true
+    }
 
 
     return {
-        //initialization:
-        load_block,
-        set_global_hooks,
-        set_callbacks,
-
+        //initialization: (should be called in this order)
+        load_block, //(call this as many times as you want)
+        set_global_hooks, //then call this once
+        app_ready_to_play, //finally call this once
+        
         //after initialization:
         take_turn,
         restart_story,
         get_state,
         set_state,
-        get_suggestions_by_thing,
-
+        
         //after initialization, for user:
         set_settings_option,
-        create_stream,
-        set_stream,
 
         //test/debug:
         log_load_info,

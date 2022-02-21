@@ -2,30 +2,30 @@
 
 
 
-Duplex is Maisonette's standard HTML template.
+page_styler provides some styling functions.
 
 If you want to change output containers, for example
 if you want to output the room description into another panel,
 you should do this via Maisonette. Maisonette handles
 output to the HTML page.
 
-Duplex just allows you to control the look of your website.
-Duplex offers some simple options to customize the looks
+page_styler just allows you to control the look of your website.
+page_styler offers some simple options to customize the looks
 of your game. If you need more options, you can always drop
 custom CSS or JS into your game.
 
-But for starting out, you can just use the Duplex functions;
+But for starting out, you can just use the page_styler functions;
 they should be fine for the most basic styling needs.
 
-Duplex commands are called like so:
+page_styler commands are called like so:
 
-duplex.a_command(<parameters>)
+page_styler.a_command(<parameters>)
 
-Here's a list of all duplex commands:
+Here's a list of all page_styler commands:
 
-name: duplex.set_color
+name: page_styler.set_color
 what it does: sets a color
-example: duplex.set_color("main background color", "black")
+example: page_styler.set_color("main background color", "black")
 
 parameters:
 1. parameter: A valid color option string.
@@ -41,14 +41,14 @@ These are all valid color option strings:
     "top bar foreground color": The small bar on top: foreground color.
     "bottom bar background color": Same for the bottom bar.
     "bottom bar foreground color": Same for the bottom bar.
-    "image panel border color": Redundant. Use duplex.set_image_panel, instead.
+    "image panel border color": Redundant. Use page_styler.set_image_panel, instead.
 
 notes: It's okay to change colors during the game.
 
 ***
 
-name: duplex.hide_image_panel
-example:  duplex.hide_image_panel()
+name: page_styler.hide_image_panel
+example:  page_styler.hide_image_panel()
 parameters: no
 what it does: hides the image panel
 notes: It's okay to hide and (re)show the panel during the game.
@@ -56,15 +56,15 @@ notes: It's okay to hide and (re)show the panel during the game.
 ***
 
 
-name: duplex.show_image_panel
-example:  duplex.show_image_panel()
+name: page_styler.show_image_panel
+example:  page_styler.show_image_panel()
 parameters: no
 what it does: shows the image panel
 
 ***
 
-name: duplex.set_image_panel
-example: duplex.set_image_panel("50%", "8px", "blue")
+name: page_styler.set_image_panel
+example: page_styler.set_image_panel("50%", "8px", "blue")
 what it does: sets the style of the image panel
 parameters:
 1. radius: This sets rounded edges for the image.
@@ -80,8 +80,8 @@ parameters:
 
 ***
 
-name: duplex.set_page_max_width
-example: duplex.set_page_max_width(1600)
+name: page_styler.set_page_max_width
+example: page_styler.set_page_max_width(1600)
 what it does: sets maximum width of the page
 
 parameters:
@@ -97,14 +97,14 @@ you will see an empty space on the left and right side of the screen
 be visually irritating.)
 
 Note: Pass a number to this function, not a string.
-DO: duplex.set_page_max_width(1600)
-DON'T: duplex.set_page_max_width("1600px")
+DO: page_styler.set_page_max_width(1600)
+DON'T: page_styler.set_page_max_width("1600px")
 
 Note: The default page max width is 1280. You probably don't need to change it.
 
 ***
 
-name: duplex.set_columns
+name: page_styler.set_columns
 example: set_columns("26%", "48%", "26%")
 what it does: This sets the width of the three columns from left to right.
 
@@ -123,7 +123,7 @@ Note: Do not use "px" or "rem" values. Only percent values are allowed here.
 
 ***
 
-name: duplex.set_center_rows
+name: page_styler.set_center_rows
 example: set_center_rows("40%", "60%", "1.8rem")
 what it does: The center column has two panels, one at the top, one at the bottom.
 This sets the size of these panels.
@@ -145,8 +145,8 @@ to account for the space in between. (Its height will be: 50% of the center colu
 
 ***
 
-name: duplex.set_scrollbar_style
-example: duplex.set_scrollbar_style("modern", "#ddd", "#888")
+name: page_styler.set_scrollbar_style
+example: page_styler.set_scrollbar_style("modern", "#ddd", "#888")
 what it does: This tries to set the scrollbar style for your game.
 
 Parameters:
@@ -171,14 +171,14 @@ Styles:
 
 ***
 
-name: duplex.set_root_font_size
-example: duplex.set_root_font_size("0.5rem")
+name: page_styler.set_root_font_size
+example: page_styler.set_root_font_size("0.5rem")
 what it does: scales all text on the page up or down
 
 parameters:
 1. new size of the root font. Use "rem" units.
 
-Note: The default root font size set by Duplex is "0.875rem", which should translate to "14px" on most browsers. If, for example, you call 'duplex.set_root_font_size("1.0rem")' the font size will go up to 16 pixels.
+Note: The default root font size set by page_styler is "0.875rem", which should translate to "14px" on most browsers. If, for example, you call 'page_styler.set_root_font_size("1.0rem")' the font size will go up to 16 pixels.
 
 Note: This should only be called once at the beginning of the game. Don't call this
 during the game or it will interfere with accessibility settings.

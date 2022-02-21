@@ -15,6 +15,8 @@
 
   <link href="css/gui.css" rel="stylesheet">
 
+  <link href="css/help.css" rel="stylesheet">
+
   <!--<link href="css/open-project-window.css" rel="stylesheet">-->
 
   <link rel="stylesheet" href="codemirror-5.19.0/lib/codemirror.css">
@@ -24,6 +26,12 @@
 </head>
 
 <body>
+
+    
+    <div class="inside-browser">
+        Please read the README.txt.<br>
+        It tells you how to start Maisonette! :)
+    </div>
 
     <div id="dev-console">
         <p><b>developer console</b><button class="my-button"
@@ -75,13 +83,28 @@
         </div>
 
         <div class="main-box">
-            
+          
             <div id="main-box-column-editor" class="main-box-column-editor">
             </div>
 
             <div id="main-box-column-preview" class="main-box-column-preview">
+
+                <div class="preview-area-tabs">
+                    <div class="tab" id="tab-play" onclick="click_tab('play')">Play</div>
+                    <div class="tab unslctd" id="tab-help" onclick="click_tab('help')">Help</div>
+                </div>
+
                 <div class="preview">
-                    <iframe id="preview-iframe" src="" title="preview"></iframe>
+
+                    <div class="tab-box-play tab-box">
+                        <iframe id="preview-iframe" src="" title="preview"></iframe>
+                    </div>
+
+                    <div class="tab-box-help tab-box">
+                        
+                    </div>
+
+
                 </div>
 
                 <div class="error-box">
@@ -89,8 +112,12 @@
                 </div>
 
             </div>
+        
         </div>
 
+        <div class="top-bar">
+<!-- currently not used. -->
+        </div>
 
 
     </div>
@@ -126,6 +153,10 @@
 
     <script src="js/utils.js"></script>
 
+    <script src="js/help-processor.js"></script>
+
+    <script src="js/help-contents.js"></script>
+
     <script src="js/create-html-page.js"></script>
 
     <script src="js/preprocessor.js"></script>
@@ -139,6 +170,8 @@
     <script src="js/run.js"></script>
 
     <script src="js/test-tools/test-tools.js"></script>
+
+    <script src="js/showdown.min.js"></script>
 
 
 </body>

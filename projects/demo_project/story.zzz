@@ -1,0 +1,29 @@
+
+
+#thing apple
+
+#function start
+	say (`You are in the kitchen.
+    	You see a ((sandwich)).`)
+
+	say (`Are you even hungry?`)
+
+	styler.link_box("4px", "4px")
+	styler.color("thing button background color hover", "blue")
+	styler.color("thing button foreground color hover", "white")
+	styler.color("thing button background color", "red")
+
+
+#thing eat
+
+#thing sandwich
+ 
+ 
+#thing drink
+
+#rule eat sandwich
+You eat the sandwich. ((the Sandwich * sandwich))
+
+
+#rule drink sandwich
+You cannot drink the sandwich.

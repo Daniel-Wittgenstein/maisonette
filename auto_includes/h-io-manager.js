@@ -1,7 +1,7 @@
 
 /*
 
-The IO-manager handles inout/output and sets global vars.
+The IO-manager handles input/output and sets global vars.
 This is the app entry point.
 
 */
@@ -76,8 +76,16 @@ const stop = "stop"
     }
 
     function show_error(err) {
+        /* We could send the error to the editor
+        for displaying, but we actually want
+        to also show the error in a browser enviroment.
+        So we display the error directly in the browser window/iframe
+        AND send a signal to the parent editor for further
+        processing (for example so the editor can highlight
+        the relevant wrong line). But error display is only
+        handled here, not in the editor. */
         let err_text = get_error_text(err)
-        $("body").prepend(err_text)
+        $("body").prepend("<div class='msn-error-box'>"+err_text+"</div>")
         try {
             parent.iframe_reports_error(err)
         } catch(e) {
@@ -131,69 +139,11 @@ const stop = "stop"
         return parts[parts.length - 1]
     }
 
-    let suggestions = {}
 
-    function on_stream_receives_new_content(stream, item) {
-        /* form of passed items:
-        {
-            type: "link", //or "html" etc.,
-            content:
-            {
-                text: text,
-                thing_id: id, //if link
-                error: false, //maybe passed, does not matter
-            }
-        }
-        */
-        console.log("STREAM RECEIVED NEW CONTENT", stream.id, stream, item)
-        let el = get_dom_element_from_stream(stream)
-        if (!el) return //error already thrown
-        let thing_id = item.content.thing_id
-        let html = false
-
-        if (thing_id) {
-            //refresh options for linked thing:
-            suggestions[thing_id] = world_manager.get_suggestions_by_thing(thing_id)
-            if (!suggestions[thing_id].length) {
-                //thing link, but there are currently no options:
-                //just display as normal text:
-                html = preprocess_output_text(item.content.text)
-            }
-        }
-        
-        if (!html) html = get_html_from_stream_item(item)
-
-        el.append(html)
-    }
-    
     let iom_settings = {
         accessible_links: true,
     }
 
-    function get_html_from_stream_item(item) {
-        let html = ""
-        if (item.type === "html") {
-            //no html escaping here, it's perfectly fine to print html:
-            let text = item.content.text
-            if (!text) return ""
-            text = preprocess_output_text(text)
-            return text
-        } else if (item.type === "link") {
-            let text = item.content.text
-            let id = item.content.thing_id
-            if (!text) return ""
-            text = preprocess_output_text(text)
-            if (iom_settings.accessible_links) {
-                html = `<a href="#" class="msn-link msn-link-for-thing
-                    msn-link-as-link" data-thing-id="${id}">${text}</a>`
-            } else {
-                html = `<span class="msn-link msn-link-for-thing
-                    msn-link-as-span" data-thing-id="${id}">${text}</span>`
-            }
-            return html
-        }
-    }
-    
 
     function preprocess_output_text(html) {
         /* This could do a final touch-up for the text that
@@ -203,31 +153,17 @@ const stop = "stop"
         return html
     }
 
-    function on_stream_flushed(stream) {
-        let el = get_dom_element_from_stream(stream)
-        if (!el) return //error already thrown
-        console.log("Flushed div " + stream.dom_selector)
-        el.html("")
-    }
-
-    function get_dom_element_from_stream(stream) {
-        let el = $(stream.dom_selector)
-        if (el.length === 0) {
-            throw `There is no HTML element with id '${stream.dom_selector.replace("#", "")}'`
-            return false
-        }
-        return el
-    }
+/*
 
     function init_event_handlers() {
-        $("body").on("click", ".msn-link-for-thing", function() {
+        $("body").on("click", ".msn-button-for-thing", function() {
             let data = $(this).data()
             let thing_id = data.thingId //thing-id is converted to thingId, apparently
-            let su = suggestions[thing_id]
-            console.log(21, su)
+
+
         })
     }
-
+*/
 
     //define onload:
 
@@ -249,6 +185,10 @@ const stop = "stop"
         //console.clear() //nice for user, but terrible for us while developing
         world_manager.log_load_info()
 
+        stream_manager.create_stream("main", ".center-bottom")
+
+        stream_manager.set_stream("main")
+
         let result = world_manager.set_global_hooks(window,
             {globalize_all_entities: true})
 
@@ -257,26 +197,30 @@ const stop = "stop"
             return
         }
     
-        init_event_handlers()
-
-        world_manager.set_callbacks({
-            on_stream_receives_new_content: on_stream_receives_new_content,
-            on_stream_flushed: on_stream_flushed,
-        })
-
-
         //create a global object that contains
         //some additional convenience functions
         //for the user (namespaced to an object,
         //because they won't be used all the time):
-
         let wm = world_manager
         window.mais = {
             set_wm_option: wm.set_settings_option,
-            create_stream: wm.create_stream,
-            set_stream: wm.set_stream,
+            create_stream: stream_manager.create_stream,
+            set_stream: stream_manager.set_stream,
         }
 
+        stream_manager.app_ready_to_play()
+
+        world_manager.app_ready_to_play()
+
+        //todo to do: load story if saved to localStorage etc. 
+
+        //if no saved game, just tell the world manager
+        //to start the story from scratch,
+        //but pass true, because there is no need
+        //to reset the story state (the story state
+        //already IS at the beginning state):
+        //This is the only instance where true should be passed
+        world_manager.restart_story(true)
 
         //test:
         //world_manager.take_turn("eat sandwich")

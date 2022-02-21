@@ -1,4 +1,50 @@
 
+
+.maisonette-asset {
+    /* most likely you do not want to override this
+    (unless for testing purposes, maybe) */
+    display: none;
+}
+
+.msn-error-box {
+    /* how maisonette runtime errors are displayed. */
+    background: var(--main-bg);
+    color: var(--main-fg);
+    border: 4px solid #D00;
+    padding: 1rem;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 900000;
+}
+
+.msn-text {
+    display: inline;
+    font-size: 1rem;
+    border: 0px solid black;
+    padding: 0px;
+    margin: 0px;
+}
+
+.msn-button-for-thing {
+    display: inline;
+    background: var(--button-thing-bg) !important;
+    border: 0px solid black;
+    border-radius: var(--button-thing-radius);
+    padding: var(--button-thing-padding) !important;
+    font-family: sans-serif;
+    color: var(--button-thing-fg);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 0px;
+}
+
+.msn-button-for-thing:hover {
+    background: var(--button-thing-bg-hover) !important;
+    color:  var(--button-thing-fg-hover) !important;
+}
+
 :root {
     --main-bg: #FFF;
     --main-fg: #222;
@@ -24,7 +70,14 @@
     --display-center-top: block; /* must be block or none */
     --center-gap-height: 1rem;
 
-    font-size: 0.875rem;
+    --button-thing-bg: none;
+    --button-thing-fg: rgb(1, 95, 119);
+    --button-thing-bg-hover: none;
+    --button-thing-fg-hover: grey;
+    --button-thing-padding: 0rem;
+    --button-thing-radius: 0px;
+
+    font-size: 0.875rem; /* not a variable! does not start with -- */
 }
 
 
@@ -144,7 +197,6 @@ body {
 }
 
 .box-center {
-    text-indent: 1rem;
     overflow: hidden;
     padding: 0rem;
     line-height: 1.5rem;

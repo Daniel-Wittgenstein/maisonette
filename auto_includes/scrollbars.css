@@ -8,10 +8,10 @@ If not, it is never loaded and scrollbars stay default. */
 }
  
     /* webkit browsers:
-    just setting the background and foreground color on Chrome is awful,
-    so we set some other things, too
-    
+    just setting the background and foreground color on Chrome is meh,
+    so we set the width, too
     */
+
 ::-webkit-scrollbar {
     width: 12px;
 }
