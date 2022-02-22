@@ -8,14 +8,12 @@ help_processor = (function() {
         //get toc contents:
         $(".tab-box-help").first().find("h1, h2, h3, h4, h5, h6").each( function() {
             let el = $(this)
-            console.log(el, 2)
             toc.push({
                 text: el.text(),
                 id: el.prop("id"),
                 level: Number(el[0].nodeName.substr(1)),
                 jq_el: el,
             })
-            console.log(toc)
         })
         //now create html from them:
         let html = ""

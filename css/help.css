@@ -15,3 +15,11 @@
     font-family: monospace;
 }
 
+.tab-box-help > h1 {
+    color: var(--help_heading_fg);
+}
+
+.tab-box-help > h2 {
+    color: var(--help_heading_fg);
+}
+

@@ -72,7 +72,7 @@ changed by zooming in and out (ctrl and +, ctrl and -) */
     height: calc(100vh - 70px);
     display: flex;
     flex: 1;
-    flex-direction: row; /* or row-reverse to swap left and right column */
+    flex-direction: row;
 }
 
 .xbar {
@@ -241,6 +241,7 @@ select {
 
 .tab-box-help {
     overflow: auto;
+    display: none;
 }
 
 #preview-iframe {

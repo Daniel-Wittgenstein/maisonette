@@ -1,0 +1,17 @@
+
+
+/* verb-selector is the dropdown that pops up when you click on a thing link */
+
+
+.verb-selector {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.verb-selector-button {
+    display: block;
+    width: 100%;
+}

@@ -1012,17 +1012,21 @@ function init_keyboard_shortcuts() {
 function init_editor_shower() {
     $("#show-editor").on("change", () => {
         let val = $("#show-editor").val()
-        if (val === "show") {
+        if (val === "only-editor") {
             show_editor()
-        } else {
+        } else if (val === "only-play") {
             hide_editor()
+        } else if (val === "editor-play") {
+            $(".main-box").css("flex-direction", "row")
+        } else if (val === "play-editor") {
+            $(".main-box").css("flex-direction", "row-reverse")
         }
     })
 }
 
 function show_editor() {
     $("#main-box-column-editor").css("display", "flex")
-    $("#main-box-column-preview").css("width", "50vw")
+    $("#main-box-column-preview").css("width", "50vw")    
     settings.show_editor = true
 }
 

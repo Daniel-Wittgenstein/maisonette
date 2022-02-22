@@ -431,14 +431,18 @@ world_manager = (function() {
             specific_command_to_rules[acc].push(rule)
         }
 */
-        console.log("RULES", rules)
+        //console.log("RULES", rules)
 
     }
 
 
         
     function get_suggestions_by_thing(thing_id) {
-        //THIS FUNCTION IS NOT EXPORTED ANYMORE
+        //right now we call this over and over again
+        //from the stream_manager.
+        //if this leads to performance issues,
+        //we should implement some caching mechanism
+        //either in the world_manager or in the stream_manager
         /*
             should return an array containing object entries as such:
             {
@@ -1257,6 +1261,7 @@ world_manager = (function() {
         restart_story,
         get_state,
         set_state,
+        get_suggestions_by_thing,
         
         //after initialization, for user:
         set_settings_option,
@@ -1272,4 +1277,4 @@ world_manager = (function() {
 
 
 //testing:
-parent.wm = world_manager
+parent.world_manager = world_manager

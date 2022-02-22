@@ -61,6 +61,8 @@ themes = [
             ["input_bg", "#333"],
             ["input_fg", "#FFF"],
             ["border_col", "#DDD"],
+            ["help_heading_fg", "#5a9fc7"],
+            
         ],
         table_color: {
             block_start: "#0B0",
@@ -106,6 +108,7 @@ themes = [
             ["input_bg", "#FFF"],
             ["input_fg", "#000"],
             ["border_col", "#BBB"],
+            ["help_heading_fg", "#153f57"],
         ],
         table_color: {
             block_start: "#cffdd7",
@@ -149,7 +152,9 @@ themes = [
             ["window_close_button_fg_highlighted", "#FFF"],
             ["input_bg", "#000"],
             ["input_fg", "#FFF"],
-            ["border_col", "#FFF"],        ],
+            ["border_col", "#FFF"],
+            ["help_heading_fg", "#FFF"],
+        ],
         table_color: {
             block_start: "#0B0",
             special_command: "#00B",
@@ -189,7 +194,9 @@ themes = [
             ["window_close_button_fg_highlighted", "#FFF"],
             ["input_bg", "#008"],
             ["input_fg", "#FFF"],
-            ["border_col", "#FFF"],        ],
+            ["border_col", "#FFF"],
+            ["help_heading_fg", "#FFF"],
+        ],
         table_color: {
             block_start: "#0B0",
             special_command: "#808",
