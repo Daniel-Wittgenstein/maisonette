@@ -1,14 +1,15 @@
 
 //this should contain
 //a string containing markdown!!
-//everything else (HTml conversion, CSS) is taken
+//everything else (HTML conversion, CSS) is taken
 //care of by Maisonette. You can just
 //change the markdown here to change the
-//documenta
+//document
+
+const { setImmediate } = require("async")
 
 
 window.msn_help_contents = `
-
 
 
 # First things first
@@ -207,9 +208,59 @@ MaisonetteScript is the language used to create Maisonette games.
 This documentation will guide you through MaisonetteScript's features.
 
 
+## Output and Visuals
 
 
+### Output boxes
 
+You can show text in different areas of the HTML page.
 
+Maisonette calls these areas "boxes".
+
+Use the command 'box' to define what output box should
+currently be used. These are the allowed commands:
+
+- box("main") ----- Outputs text to the main box (the center bottom box).
+
+- box("main-top") ----- Outputs text to the center top box (above the main box).
+
+- box("top") ----- Outputs text to the top box.
+
+- box("bottom") ----- Outputs text to the bottom box.
+
+- box("left") ----- Outputs text to the left box.
+
+- box("right") ----- Outputs text to the right box.
+
+Example:
+
+    #function start
+    box("left")
+    say(\`I am on the left-hand side.\`)
+    box("right")
+    say(\`I am on the right-hand side.\`)
+    say(\`So am I!\`)
+    box("main")
+    say(\`I'm in the middle.\`)
+
+### Custom output areas
+
+This is an experimental feature. It can be changed or removed
+at any time.
+
+You can output text to custom HTML divs (or even to other elements.)
+
+Example:
+
+    box("left")
+    say ("I am left.")
+
+    world_manager.create_stream("my-stream", "my-custom-div")
+	stream_manager.set_stream("my-stream")
+	say ("I am inside a custom HTML element!")
+
+Note that for custom areas you have
+to use 'stream_manager.set_stream' instead of box.
 
 `
+

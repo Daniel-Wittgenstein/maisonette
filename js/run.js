@@ -780,6 +780,7 @@ function init_help_box() {
 
 function markdown_to_html(md) {
     let html
+    md = md.replaceAll("_", "&#x5f;")
     let converter = new showdown.Converter()
     html = converter.makeHtml(md)
     return html

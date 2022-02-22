@@ -3,10 +3,17 @@
 #thing apple
 
 #function start
-console.trace();
-	console.log(yes, window.yes)
+
 
 	box("left")
+	say ("I am left.")
+
+    stream_manager.create_stream("my-stream", ".center-top")
+	
+	stream_manager.set_stream("my-stream")
+
+	say ("I am inside a custom HTML element.")
+
     
 	say (`You are in the kitchen.
     	You see a ((sandwich)).`)
