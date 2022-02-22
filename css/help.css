@@ -6,6 +6,7 @@
     color: var(--fg_col);
     padding: 20px;
     font-family: sans-serif;
+    line-height: 1.4rem;
 }
 
 .code-box {

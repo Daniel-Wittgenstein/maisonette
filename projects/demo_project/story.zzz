@@ -42,7 +42,11 @@
 
 
 
+    #option
+    add_option("take", -500, "dfgd")
 
+
+#thing take
 
 #thing eat_111111
 

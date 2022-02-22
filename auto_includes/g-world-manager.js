@@ -507,7 +507,6 @@ world_manager = (function() {
             //thing appears:
         let spec_rules_list = get_specific_applying_rules_by_thing_id(thing_id)
 
-
         //2. now we have all the specific rules, but we have to create a verb
         //list out of that:
 
@@ -867,6 +866,10 @@ world_manager = (function() {
 
 
     function do_rule_cascade(action_obj) {
+        //to do: adapt this to new docs.
+        //stop phase is named "do" phase now.
+        //before phase stops by default.
+        //other phases: we still have to work out the details
         let order = [
             "before",
             "stop",
