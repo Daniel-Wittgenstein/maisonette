@@ -6,7 +6,6 @@
 //change the markdown here to change the
 //document
 
-const { setImmediate } = require("async")
 
 
 window.msn_help_contents = `
