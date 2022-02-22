@@ -67,10 +67,7 @@ stream_manager = (function() {
 
 
     function on_turn_finished() {
-        function get_sugg(that) {
-            let data = that.data()
-            if (!data.thing) return //non-thing links not supported yet
-            let thing_id = data.thing
+        function get_sugg(thing_id) {
             let sugg_list = world_manager.get_suggestions_by_thing(thing_id)
             return sugg_list
         }
@@ -87,13 +84,19 @@ stream_manager = (function() {
         //add new click handlers:
 
         $(".msn-button-for-thing").on ("mouseover", function(e) {
-            let sugg_list = get_sugg( $(this) )
-            verb_selector.show($(this), sugg_list, {view: "dropdown"})
+            let data = $(this).data()
+            if (!data.thing) return //non-thing links not supported yet
+            let thing_id = data.thing
+            let sugg_list = get_sugg( thing_id )
+            verb_selector.show($(this), sugg_list, thing_id, {view: "dropdown"})
         })
 
         $(".msn-button-for-thing").on ("click", function(e) {
-            let sugg_list = get_sugg( $(this) )
-            verb_selector.show($(this), sugg_list, {view: "maxi"})
+            let data = $(this).data()
+            if (!data.thing) return //non-thing links not supported yet
+            let thing_id = data.thing
+            let sugg_list = get_sugg( thing_id )
+            verb_selector.show($(this), sugg_list, thing_id, {view: "maxi"})
         })
 
         //todo to do: 1. hide dropdown on scroll. / 2. maxi view
@@ -133,23 +136,23 @@ stream_manager = (function() {
 
     class VerbSelector {
 
-        show(parent_link, sugg_list, options) {
+        show(parent_link, sugg_list, thing_id, options) {
             if (options.view === "dropdown") {
-                this.show_dropdown(parent_link, sugg_list, options)
+                this.show_dropdown(parent_link, sugg_list, thing_id, options)
             } else if (options.view === "maxi") {
-                this.show_maxi(parent_link, sugg_list, options)
+                this.show_maxi(parent_link, sugg_list, thing_id, options)
             } else {
                 throw `Maisonette internal error: '${options.view}'
                     is not a valid view mode.`
             }
         }
 
-        show_maxi(parent_link, sugg_list, options) {
+        show_maxi(parent_link, sugg_list, thing_id, options) {
             //todo to do; not implemented yet
             return
         }
 
-        show_dropdown(parent_link, sugg_list, options) {
+        show_dropdown(parent_link, sugg_list, thing_id, options) {
             this.hide()
 
             this.dom_el = $(`<div class="verb-selector"></div>`)
@@ -159,12 +162,14 @@ stream_manager = (function() {
             //console.log(rect.top, rect.right, rect.bottom, rect.left)
             //console.log(this.dom_el)
             //populate div and gets its width/height after populating:
+            //console.log(sugg_list)
             let html = ""
             for (let item of sugg_list) {
                 let txt = escape_html(item.custom_text)
-                html += `<button class="verb-selector-button">${txt}</button>`
+                let act_str = item.verb + " " + thing_id
+                html += `<button class="verb-selector-button"
+                    data-action-string="${act_str}">${txt}</button>`
             }
-            
             this.dom_el.html(html)
             let w = this.dom_el.width()
             let h = this.dom_el.height()
@@ -222,7 +227,11 @@ stream_manager = (function() {
     function init_event_handlers() {
         /* (mouseover (hover) events are easier to handle
         with event handlers not bound to the parent) */
-        //$("")
+        $("body").on("click", ".verb-selector-button", function(e) {
+            let data = $(this).data()
+            world_manager.take_turn(data.actionString)
+        })
+
     }
 
     function create_stream(id, dom_selector) {
