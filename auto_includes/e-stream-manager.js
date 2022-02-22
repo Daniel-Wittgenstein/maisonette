@@ -24,19 +24,23 @@ stream_manager = (function() {
                     Correct usage:
                     stream_manager.create_stream("my_stream_name", "#id-of-an-html-element")`
                 return
-            }
-            
+            }            
             streams[id] = this
             this.dom_selector = dom_selector
             this.id = id
             this.content = []
         }
+
         set_as_current() {
             current_stream = this
         }
+
         flush() {
+            console.log("flushing stream", this)
             this.content = []
+            $(this.dom_selector).html("")
         }
+        
         add_content(item) {
             this.content.push(item)
             if (!item.is_stream_item) {
@@ -52,7 +56,9 @@ stream_manager = (function() {
         current_stream.add_content(item)
     }
 
-
+    function turn_starts() {
+        flush_all_streams()
+    }
 
     function turn_finished() {
         //this gets called by the world_manager
@@ -63,7 +69,11 @@ stream_manager = (function() {
         on_turn_finished()
     }
 
-
+    function flush_all_streams() {
+        for (let stream of Object.values(streams)) {
+            stream.flush()
+        }
+    }
 
 
     function on_turn_finished() {
@@ -104,6 +114,7 @@ stream_manager = (function() {
     }
 
     function on_stream_received_new_item(stream, item) {
+        console.log(stream, "rec", item)
         let dom_el = $(stream.dom_selector)
         let end_space = "&nbsp;" //might cause suboptimal word-wrapping
             //but it's the only way to force spaces apparently
@@ -301,6 +312,7 @@ stream_manager = (function() {
         set_stream,
         add_content,
         set_option,
+        turn_starts,
         turn_finished,
         app_ready_to_play,
     }

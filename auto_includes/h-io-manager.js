@@ -186,11 +186,19 @@ const stop = "stop"
         world_manager.log_load_info()
 
         stream_manager.create_stream("main", ".center-bottom")
+        stream_manager.create_stream("top", ".box-top")
+        stream_manager.create_stream("bottom", ".box-bottom")
+        stream_manager.create_stream("left", ".box-left")
+        stream_manager.create_stream("main-top", ".center-top")
+        stream_manager.create_stream("right", ".box-right-text-box")
 
         stream_manager.set_stream("main")
 
         let result = world_manager.set_global_hooks(window,
             {globalize_all_entities: true})
+
+        //also global:
+        window.box = box
 
         if (result.error) {
             show_error(result)
@@ -229,6 +237,19 @@ const stop = "stop"
     })
 
 
+    
+    function box(stream_name) {
+        /* Friendly function for your common stream settings
+        needs. Only works with standard streams (custom streams
+        are an experimental feature right now). */
+        let keys = ["main", "top", "bottom",
+            "left", "main-top", "right"]
+        if (!keys.includes(stream_name)) {
+            throw `command 'box("${stream_name}")':
+                stream with name '${stream_name}' does not exist.`
+        }
+        stream_manager.set_stream(stream_name)
+    }
 
 
 

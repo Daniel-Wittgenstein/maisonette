@@ -3,8 +3,15 @@
 #thing apple
 
 #function start
+console.trace();
+	console.log(yes, window.yes)
+
+	box("left")
+    
 	say (`You are in the kitchen.
     	You see a ((sandwich)).`)
+
+	box("main-top")
 
 	say (`Are you even hungry?`)
 

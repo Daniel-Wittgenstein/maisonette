@@ -837,6 +837,9 @@ world_manager = (function() {
         This way the io-manager and stream-manager do not have to deal
         with action objects*/
         //console.log("take turn", action_str)
+
+        stream_manager.turn_starts()
+
         let res = take_turn_proper(action_str)
 
         stream_manager.turn_finished()
@@ -940,9 +943,8 @@ world_manager = (function() {
         if (str === "%begin") {
             //story start. this should only be issued internally,
             //when the story starts. When the story starts,
-            //the user-defined start function is run and then the engine
-            //takes a %begin turn. This is pretty much like an idle turn
-            //(see below)
+            //the user-defined start function is run.
+            glob["start"]()
             return {error: false, idle: true}
         }
 
@@ -1221,12 +1223,12 @@ world_manager = (function() {
 
     function restart_story(after_app_init = false) {
                 //todo: rest of function
+            //start must be part of turn
         if (!initial_state) throw `Developer mistake: cannot
             restart story: no valid initial_state`
         if (!after_app_init) set_state(initial_state)
         if (!glob["start"]) throw `Your story should have a function named 'start'.
         This is where your story starts.`
-        glob.start()
         take_turn("%begin")
         return true
     }
