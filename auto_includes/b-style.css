@@ -33,6 +33,11 @@
     --button-thing-padding: 0rem;
     --button-thing-radius: 0px;
 
+    --verb-selector-bg: #000;
+    --verb-selector-fg: #FFF;
+    --verb-selector-hover-bg: #FFF;
+    --verb-selector-hover-fg: #000;
+
     font-size: 0.875rem; /* not a variable! does not start with -- */
 }
 

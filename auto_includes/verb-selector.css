@@ -8,10 +8,25 @@
     display: none;
     flex-direction: column;
     justify-content: center;
+    border: 1px solid var(--verb-selector-border-col);
+    border-radius: var(--verb-selector-border-radius);
 }
 
 
 .verb-selector-button {
     display: block;
     width: 100%;
+    background: var(--verb-selector-bg);
+    color: var(--verb-selector-fg);
+    font-family: sans-serif;
+    text-decoration: none;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
 }
+
+.verb-selector-button:hover {
+    background: var(--verb-selector-hover-bg);
+    color: var(--verb-selector-hover-fg) !important;
+}
+

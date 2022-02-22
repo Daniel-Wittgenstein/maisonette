@@ -9,9 +9,25 @@
 	say (`Are you even hungry?`)
 
 	styler.link_box("4px", "4px")
-	styler.color("thing button background color hover", "blue")
-	styler.color("thing button foreground color hover", "white")
-	styler.color("thing button background color", "red")
+	styler.set("thing button background color hover", "blue")
+	styler.set("thing button foreground color hover", "white")
+	styler.set("thing button background color", "red")
+    
+    styler.set("verb selector hover background color", "red")
+    styler.set("verb selector hover foreground color", "yellow")
+    
+    styler.set("verb selector background color", "green")
+    styler.set("verb selector foreground color", "orange")
+    
+    styler.set("verb selector hover background color", "red")
+    styler.set("verb selector hover foreground color", "yellow")
+    
+    styler.set("verb selector border radius", "4px")
+    styler.set("verb selector border color", "green")
+    
+
+
+
 
 
 #thing eat_111111

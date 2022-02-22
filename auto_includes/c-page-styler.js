@@ -62,8 +62,9 @@ let styler = (() => {
     let scroll_bar_style_set = false
 
     let funcs = {
-        color: (prop, color) => {
+        set: (prop, c) => {
             let lookup = {
+                //colors:
                 "main background color": "main-bg",
                 "main foreground color": "main-fg",
                 "panels border color": "border-color",
@@ -76,12 +77,21 @@ let styler = (() => {
                 "thing button foreground color": "button-thing-fg",
                 "thing button background color hover": "button-thing-bg-hover",
                 "thing button foreground color hover": "button-thing-fg-hover",
+                "verb selector background color": "verb-selector-bg",
+                "verb selector foreground color": "verb-selector-fg",
+                "verb selector hover background color": "verb-selector-hover-bg",
+                "verb selector hover foreground color": "verb-selector-hover-fg",
+                "verb selector border color": "verb-selector-border-col",
+
+                //non-colors:
+                "verb selector border radius": "verb-selector-border-radius",
+        
             }
             if (!lookup[prop]) return {
                 error: true,
-                msg: `set_color: I don't know this option: '${prop}'`,
+                msg: `style: I don't know this option: '${prop}'`,
             }
-            set_css_var(lookup[prop], color)
+            set_css_var(lookup[prop], c)
             return true
         },
 
@@ -90,6 +100,9 @@ let styler = (() => {
             set_css_var("button-thing-padding", padding)
             set_css_var("button-thing-radius", radius)             
         },
+
+
+
 
         show_image_panel: () => {
             set_css_var("image-panel-display", "flex")

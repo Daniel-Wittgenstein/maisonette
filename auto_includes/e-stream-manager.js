@@ -99,7 +99,7 @@ stream_manager = (function() {
             verb_selector.show($(this), sugg_list, thing_id, {view: "maxi"})
         })
 
-        //todo to do: 1. hide dropdown on scroll. / 2. maxi view
+        //todo to do: 1. hide dropdown on scroll. / 2. hide on click / 3. maxi view
 
     }
 
