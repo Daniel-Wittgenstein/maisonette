@@ -242,7 +242,7 @@ Example:
     box("main")
     say(\`I'm in the middle.\`)
 
-### Custom output areas
+### Custom output areas (experimental)
 
 This is an experimental feature. It can be changed or removed
 at any time.
@@ -260,6 +260,277 @@ Example:
 
 Note that for custom areas you have
 to use 'stream_manager.set_stream' instead of box.
+
+### Page Styler
+
+The simplest way to style your game is to
+use Maisonette's "styler" module. 
+The styler offers some simple options to customize the looks
+of your game. If you need more advanced options, you can always drop
+custom CSS or JS into your game;
+but for starting out, you can just use the styler functions,
+they should be fine for the most basic styling needs.
+
+styler commands are called like so: styler.a_command( ... parameters ...)
+
+What follows is a list of all styler commands.
+
+#### styler.set
+name: styler.set
+
+what it does: sets a color or other style property
+
+example: styler.set("main background color", "black")
+
+parameters:
+1. parameter: A valid option string (see below).
+
+2. parameter: A valid color code string for colors, otherwise
+a value like "4px" or similar. Colors can be HTML color names, or they
+can be written in rgb, rgba or hex notation (just like CSS).
+Note the American spelling (writing "colour" is not allowed).
+
+These are all valid option strings:
+
+- "main background color": Sets the main background color.
+
+- "main foreground color": Sets the main foreground color.
+
+- "panels border color": sets the color of the borders separating the text panels
+from each other. If the text panels have a white background, a light grey tone is recommended for "panels border color", but you can use whatever you want.
+
+- "top bar background color": The small bar on top: background color.
+
+- "top bar foreground color": The small bar on top: foreground color.
+
+- "bottom bar background color": Same for the bottom bar.
+
+- "bottom bar foreground color": Same for the bottom bar.
+
+- "image panel border color": Redundant. Use styler.set_image_panel, instead.
+
+- "thing button background color": Thing button refers to what you may call a
+link. This sets the background color.
+
+- "thing button foreground color": And the foreground color.
+
+- "thing button background color hover": This sets the hover (mouse-over) background color.
+
+- "thing button foreground color hover": And the foreground color.
+
+- "verb selector background color": Background color for the dropdown box from which you
+select verbs.
+
+- "verb selector foreground color": And foreground color.
+
+- "verb selector hover background color": Same for hover/mouse-over.
+
+- "verb selector hover foreground color": See above.
+
+- "verb selector border color": Dropdown box border color.
+
+- "verb selector border radius": Use a value like "4px" to make the edges
+round, "0px" to make them normal (rectangular).
+
+Note: Changing colors during the game should be okay, but hasn't been thoroughly
+tested, yet.
+
+***
+
+#### styler.hide_image_panel
+
+name: styler.hide_image_panel
+
+example:  styler.hide_image_panel()
+
+parameters: no
+
+what it does: hides the image panel
+
+Note: It should be okay to hide and (re)show the panel during the game.
+
+***
+
+#### styler.show_image_panel
+
+name: styler.show_image_panel
+
+example:  styler.show_image_panel()
+
+parameters: no
+
+what it does: shows the image panel
+
+***
+
+#### styler.set_image_panel
+
+name: styler.set_image_panel
+
+example: styler.set_image_panel("50%", "8px", "blue")
+
+what it does: sets the style of the image panel
+
+parameters:
+1. radius: This sets rounded edges for the image. The unit should
+be "px" or "rem" or "%":
+
+    - "0px": no rounded edges
+
+    - "8px": slightly rounded edges.
+
+    - "50%": completely round: circle
+
+2. border-size: string defining the width of the border around the image. The unit
+should be "px" or "rem", for example: "4px". Use "0px" for no border at all.
+
+3. border-color: string with HTML color, defines the color of the border
+around the image.
+
+***
+
+#### styler.set_page_max_width
+
+name: styler.set_page_max_width
+
+example: styler.set_page_max_width(1600)
+
+what it does: sets maximum width of the page
+
+parameters:
+1. A number.
+
+Normally, your game fills the entire width of the HTML page.
+On a big screen this might not look good, though; the columns
+may be just too wide. This command sets a maximum width for the page
+in pixels. If the player's screen is bigger than this maximum
+value, the game won't fill the entire screen width, instead
+you will see an empty space on the left and right side of the screen
+(the empty space has the normal background color and shouldn't
+be visually irritating.)
+
+Note: Pass a number to this function, not a string.
+
+DO: styler.set_page_max_width(1600)
+
+DON'T: styler.set_page_max_width("1600px")
+
+Note: The default page max width is 1280. You probably don't need to change it.
+
+***
+
+#### styler.set_columns
+
+name: styler.set_columns
+
+example: set_columns("26%", "48%", "26%")
+
+what it does: This sets the width of the three columns from left to right.
+
+parameters:
+1. Left column width in percent
+2. Center column width in percent
+3. Right column width in percent
+
+If you want to hide a column entirely, use "0%". The middle column is considered
+the main column and cannot be hidden.
+
+Note: The values must add up to exactly 100%.
+
+Note: Do not use "px" or "rem" values. Only percent values are allowed here.
+
+
+#### styler.set_center_rows
+name: styler.set_center_rows
+
+example: set_center_rows("40%", "60%", "1.8rem")
+
+what it does: The center column has two panels, one at the top, one at the bottom.
+This sets the size of these panels.
+
+parameters:
+
+1. Top center panel height in percent
+
+2. Bottom center panel height in percent
+
+3. Space between top and center panel in "rem": has to be between "0.0rem" and "2.0rem"
+
+Note: Set the top center panel height to "0%" to hide it entirely. The bottom center panel
+is considered the main center panel and cannot be hidden.
+
+Note: The first two values have to add up to 100%.
+
+Note: The space between the two panels is subtracted from the top panel,
+so if you do: 'set_center_rows("50%", "50%", "1.5rem")', the two panels
+won't be exactly equal in height, instead the top one will be a tiny bit smaller
+to account for the space in between. (Its height will be: 50% of the center column height minus 1.5 rem, where "1rem" is the standard font size.)
+
+
+#### styler.set_scrollbar_style
+
+name: styler.set_scrollbar_style
+
+example: styler.set_scrollbar_style("modern", "#ddd", "#888")
+
+what it does: This tries to set the scrollbar style for your game.
+
+Parameters:
+
+1. Style name. Must be one of the following strings: "modern", "minimal"
+or "minimal-rounded"
+
+2. Trackbar color (background): HTML color
+
+3. Track thumb color (foreground): HTML color
+
+Important: this does not work 100%, because
+the browser support for setting scrollbar style is simply
+insufficient. The trackbar color and track thumb color
+setting should work on Webkit browsers
+(like Chrome and others) and also on Firefox. The style setting will only
+work on Webkit browsers. Other browsers may ignore this setting completely.
+If you want your game to just use the normal native scrollbars (different
+on each OS), simply do not call this function.
+
+Styles:
+
+- "modern": a glossy-looking scrollbar
+
+- "minimal": a minimalistic, rectangle-shaped scrollbar, might be good for a retro look
+
+- "minimal-rounded": same as minimalistic, but with rounded corners
+
+
+#### styler.set_root_font_size
+
+name: styler.set_root_font_size
+
+example: styler.set_root_font_size("0.5rem")
+
+what it does: scales all text on the page up or down
+
+parameters:
+1. new size of the root font. Use "rem" units.
+
+Note: The default root font size set by styler is "0.875rem", which should translate
+to "14px" on most browsers. If, for example, if you
+call 'styler.set_root_font_size("1.0rem")' the font size will go up to 16 pixels.
+
+Note: This should only be called once at the beginning of the game
+(in your 'start' function). Don't call this
+during the game or it will interfere with accessibility settings.
+
+Note: This is different than a browser's zoom feature, because it just scales
+the text, not the entire page layout.
+
+***
+
+
+
+
+
+
 
 `
 
