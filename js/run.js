@@ -1017,8 +1017,10 @@ function init_editor_shower() {
         } else if (val === "only-play") {
             hide_editor()
         } else if (val === "editor-play") {
+            show_editor()
             $(".main-box").css("flex-direction", "row")
         } else if (val === "play-editor") {
+            show_editor()
             $(".main-box").css("flex-direction", "row-reverse")
         }
     })
