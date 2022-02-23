@@ -1079,6 +1079,9 @@ maisonette_transpiler = (function() {
                 container = container.replace(":", "")
                 let iter = words[0]
                 if (keyword === "each") {
+                    //todo to do: there should be no let here,
+                    //the iteration variable must be global,
+                    //so we can access it from say like so: "[The item] is ..."
                     return `for (let ${iter} of ${container}) {`
                 }
                 return `for ( let ${iter} of Object.keys(${container}) ) {`

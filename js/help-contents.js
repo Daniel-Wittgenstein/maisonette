@@ -220,11 +220,47 @@ Yet another note: always save your Maisonette files with UTF-8 encoding!
 MaisonetteScript is the language used to create Maisonette games. This
 documentation will guide you through MaisonetteScript's features.
 
+### Text blocks
+
+The first thing you have to know about MaisonetteScript
+is that **you should use backticks (\`) to
+enclose text**.
+
+Short detour: Sometimes you might see
+examples where text is enclosed in quotes (") or apostrophes
+('). This is fine for simple, single-line texts,
+but breaks immediately once the text spans several lines
+(and in other cases it breaks, too).
+Whenever you see a MaisonetteScript example using quotes
+or apostrophes consider it a bad habit carried
+over from another programming language (I have that
+habit unfortunately, but I'm trying to get rid of it.)
+If you see an example using quotes in this documentation,
+I apologize.
+
+**Remember: the easiest and best way is to always use backticks
+to enclose text blocks!**
+
+If typing a backtick
+is annoying on your keyboard layout, the Maisonette editor
+has a special short-cut for that: CTRL + B.
+
+A simple example:
+
+    #function start
+        say \`It was a dark
+            and stormy
+            night ...\`
+
+This prints a text at the beginning of our game.
+Note how we can write text over several lines and with indentation.
+Maisonette automatically prints it properly.
+
 ## Rooms
 
 MaisonetteScript files consist of so-called blocks. A # (hashtag/pound) symbol
 at the beginning of a new line starts a new block. There are several
-types of blocks like "#thing" blocks, "#room" blocks and others.
+types of blocks like "#function" blocks, "#thing" blocks, "#room" blocks and others.
 Let's start with rooms.
 
 The world of a Maisonette game is made up of rooms. This is how
@@ -235,24 +271,6 @@ you define a room:
         look: "You are lost in a deep, dark forest."
 
 Note that the indentation is completely optional.
-
-Also note that the text enclosed between quotes (")
-is not allowed to span multiple lines here. Don't break the
-**look:** text over multiple lines.
-
-Instead of quotes you can also use apostrophes (')
-or backtick characters (&#96;). If a text is enclosed between
-quotes and should contain a quote, write **\\"** (backslash then quote)
-to print a quote.
-If a text is enclosed between
-apostrophes and you want it to contain an apostrophe, write **\\'** to print
-an apostrophe. And finally, if a text is enclosed between
-backticks and you want it to contain a backtick, write **&#92;&#96;** to print
-the backtick.
-
-    #room forest
-    title: \`In the Forest\`
-    look: 'It\\'s almost midnight. The forest is dark.'
 
 ## Things
 
@@ -480,7 +498,7 @@ by adding a so-called 'option block':
     You feel too weak to pick it up.
 
     #option
-    add_option("lift")
+    add_option("lift", thing)
 
 That's it. The option block adds the
 "lift" verb to **all** things. It will appear
@@ -594,10 +612,14 @@ For example you might do:
 Basically, every rule belongs to a phase: before rules belong
 to the before phase, do rules belong to the do phase, etc.
 
-The phases are run in order. Inside each phase the rules
+Once the player takes an action those phases
+are run in succession. Inside each phase the rules
 are run in the order they were defined in (from top to bottom).
 Note that (unlike in Inform 7) specificity does **NOT** affect
-rule order! Only phase and appearance in the file do. And phase
+rule order! A rule like "take *" would be less specific
+than a rule like "take fish", but that does not matter for ordering.
+Only phase and appearance in the file do, with earlier
+definitions trumping later ones. And phase
 **always** takes precedence over order of appearance in the file.
 
 This is the order of the phases:
@@ -641,23 +663,309 @@ instead of the boring standard text:
     #report take broom
     As you pick up the magic broom, it buzzes lightly.
 
+
+## option blocks
+
+### option blocks philosophy
+We have already looked at option blocks briefly, but
+they are capable of doing a lot more.
+
+First off, let's clarify a few things.
+Option blocks are **NOT** rules. They have
+a different syntax and they behave differently. Like we saw earlier,
+rules are divided into phases.
+Once the player takes an action those phases
+are run in succession until a rule triggers. Option blocks
+instead are considered before the player
+even does anything. They decide what options
+the player has, i.e. what verbs will be presented
+to the player.
+
+We have to note an important thing here: specific
+rules like "take torch" or "open chest", i.e.
+rules that apply to one specific thing, do **NOT**
+need to be enabled by an option block. Instead,
+they are automatically enabled by Maisonette.
+
+The idea is that if you write, say:
+
+    #do smell cheese
+        It smells like Switzerland.
+
+That's of course an answer you want the player to see.
+There is no need to tell Maisonette explicitly to enable
+the answer in the verb dialogue once you click on "cheese".
+I think this is a very cool feature of Maisonette
+that (hopefully) saves the game author a lot of time.
+
+It's different for generic rules like "take *".
+Here Maisonette cannot be so sure when you want
+the verb to be suggested, so it default to: never show the option
+unless instructed by an option block to do so.
+
+### option blocks Basic Usage
+
+This is the most basic usage of an option block:
+
+    #option
+    add_option("lift", thing)
+
+This adds the verb "lift" to every thing in the game.
+Now when you click on a thing you will always see
+the option "lift".
+
+But option blocks can be more sophisticated. This
+only adds the option if a condition is met:
+
+    #option
+        if player.hungry = yes and thing.edible = yes
+            add_option(eat, thing)
+        end
+
+Unlike with rules, when an option block is executed
+is doesn't stop the execution of the following
+option blocks. This will add an "eat" option
+to all things when the player is hungry;
+and it will add an "eat" option to the cake,
+even when the player is not hungry:
+
+    #thing apple
+    edible: yes
+
+    #thing cake
+    edible: yes
+
+    #option
+        if player.hungry = yes and thing.edible = yes
+            add_option(eat, thing)
+        end
+
+    #option
+        if thing = cake
+            add_option(eat, thing)
+        end
+
+Note how the first option block does not stop the next one.
+You might notice something: when the player is hungry
+the option to eat will be added **twice** to the cake.
+But the good news is that
+Maisonette is smart enough to only show the "eat" option
+once in the verb selection dialogue.
+
+### options with higher priority
+
+If an action is very important, you may want
+it to show up at the very top of the options list:
+
+    #option
+        if thing = cake
+            add_option(eat, thing, 100)
+        end
+
+This gives the option "eat the cake"
+a priority of 100. It will show up above
+options like "take cake" etc.
+
+Priorities must be integers. Please write them as plain numbers,
+not as text enclosed with quotes. (100 **NOT:** "100")
+The default priority for actions is 10 for generic actions
+and 20 for specific actions. Anything higher than 20
+goes to the top of the list. Anything lower than 10
+will be regarded as an action of lesser importance
+and will show up at the very bottom of the list (or possibly
+won't show up at all if the display settings in your game
+are set to cap the list after a certain amount of entries).
+The priority number must be in the range -1000
+to +1000.
+
+### options with custom text
+
+Normally you will see the verb name in the options dialogue.
+But you can do this:
+
+    #thing goat
+    animal: yes
+
+    #option
+        if thing.animal = yes
+            add_option(touch, thing, 100, "gently pet the goat")
+        end
+
+Note that if you add a custom text, you also **have** to add
+a priority number.
+
+### removing options and the "final" keyword
+
+You can also remove options:
+
+    #option
+        if thing.edible = no
+            remove_option(eat, thing)
+        end
+
+remove_option does not allow specifying a
+custom text or priority, it just removes the option altogether.
+
+Later option blocks could re-enable the eating option, though.
+But you can prevent this by doing:
+
+    #option
+        if thing.edible = no
+            remove_option(eat, thing, final)
+        end
+
+The "final" keyword freezes the thing's option state.
+Later option blocks do still run and can add and remove
+other things to the options, but they cannot
+enable "eat" for the things that were matched anymore
+(all edible things
+in this case).
+    
+Likewise, you can use final for add_option, too:
+
+    #option
+        if thing = goat
+            add_option(touch, thing, final, 100, "gently pet the goat")
+        end
+
+or just:
+
+    #option
+        if thing = goat
+            add_option(touch, thing, final)
+        end
+
+Note: The 'final' keyword is optional, but if it appears
+in an add_option or a remove_option it has to be the **third** parameter
+(the third word separated by commas), i.e. it must appear before priority.
+
+
+## Global Variables
+Variables are identifiers that can hold numbers or texts
+or even a reference to a room or a thing. Global means
+that a variable can be used anywhere in your story.
+Here is how you define global variables:
+
+    #thing cake
+
+    #var x = 404
+    #var my_text = "Some text ..."
+    #var a_thing = cake
+
+Note that the line "#var a_thing = cake" is just for demonstration
+purposes. Usually it would make more sense to first create the variable
+"a_thing" with some value like "no" and assign it the thing later. We will
+cover how to do that later on.
+
+## Beginning your story: the start function
+
+Here is how you print a text of the beginning of your story:
+
+    #function start
+        say (\`It was a dark and stormy night ...\`)
+
+## Code Blocks
+
+### Introduction
+
+We have already looked at "run:" sub-blocks (inside rule blocks)
+and at the "#function start" block.
+
+What these two have in common is that they
+don't execute some custom Maisonette code, but actually
+run pure JavaScript code! This may come as a shock,
+but I cheated a bit when I said that MaisonetteScript is a
+scripting language in its own right. Actually it's just
+a pretty layer that hides JavaScript.
+
+This has the obvious disadvantage that it makes
+it pretty much impossible to run
+Maisonette games without a program that understands JavaScript.
+But there are also big advantages to this approach:
+
+    - Your games will run in the browser. This makes distributing them easy.
+
+    - You have the whole power of JavaScript at your fingertips:
+    adding images, audio and even video to your game becomes easy,
+    and the sky becomes the limit.
+
+Furthermore, Maisonette sugar-coats JavaScript, so it's
+more bearable for both beginners and advanced programmers
+that happen to hate curly braces. MaisonetteScript makes
+a few changes to JavaScript
+that make it look more like Ruby or Basic
+(or like Python, but without the silly indentation
+rules; there, I said it). In the following section
+we will learn the basics of writing logic, but no JavaScript
+knowledge is required at all! You will see that
+Maisonette code is pretty straightforward and readable.
+
+### If conditions
+
+This is how you use an if-condition:
+
+    #do touch statue
+        run:
+            if lever_was_pressed = yes and red_button_was_pushed = yes
+                say \`Silently, the statue glides to the side.
+                    Behind it, you see a dark passage.\`
+                    dark_passage_open = yes
+            else
+                say \`Nothing happens.\`
+            end
+
+The indentation helps you see the structure better
+and is recommended, but Maisonette does not care whether
+you indent or not. The "else" block is optional.
+
+When the if-condition does only one thing, you can abbreviate it to:
+
+    #do touch *
+        run:
+            say \`You touch it.\`
+            if thing.is_made_of_metal: say \`It feels cold.\`
+
+Note how we have to use a colon (:) here to separate the condition
+from the outcome. Also, there is no "end" keyword; the outcome block
+ends automatically with the end of the line.
+
+### Loops
+
+Maisonette has two types of loops. "each" loops over a list:
+
+    ...
+    run:
+        let list = [0, 1, 1, 2, 3, 5, 8, 13, 21]
+        each item in list
+            say \`The next number is [item].\`
+        end
+
+"loop" loops over a thing's properties:
+
+    #thing man
+        age: 37
+        name: "Dave"
+        living: yes
+
+    ...
+    run:
+        loop key in man
+            let value = man[key]
+            say \`[key] has the value: [value].\`
+        end
+
+### Functions
+todo to do
+
+
 ### Text Substitutions Inside Rules
 
-    Inside rule blocks you can do text substitution a la:
-    [the thing] ...
-
-### suggest blocks
-    Suggest blocks can set priority from -9007199254740991
-    to 9007199254740991 and custom text.
+Inside rule blocks you can do text substitution like:
+[the thing] ...
 
 
 
 
-
-
-## Variables
-
-## Generic Rules
 
 ## Relations
 
