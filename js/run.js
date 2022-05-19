@@ -978,7 +978,8 @@ function start() {
 
     init_keyboard_shortcuts()
 
-    generate_the_story()
+    generate_the_story() //disabled for testing
+
 
     
     if (DEBUG) {

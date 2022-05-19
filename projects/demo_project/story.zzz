@@ -1,4 +1,29 @@
 
+#rule take me
+
+run:
+
+function d32322332() {
+/myregexp/g
+
+//anotherreggy
+
+`I am 
+                multi
+line`
+"string"
+
+'string2'
+
+/* multi
+
+commane*/
+
+//single comment
+
+`ss`
+
+}
 
 #thing ss
 	add: 2
@@ -67,10 +92,6 @@ You cannot drink the sandwich.
 run:
 
 	console.log(2)
-    class jasjs {
-		#rule
-   }
-  console.log(3)
   console.log(6)
   console.log(3)
   console.log(6)

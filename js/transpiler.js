@@ -118,7 +118,6 @@ maisonette_transpiler = (function() {
             transpiled_key: "o",
             nameless_allowed: true,
         },
-
         //#######################
 
         "relation": {
@@ -265,10 +264,11 @@ maisonette_transpiler = (function() {
         
         takes maisonetteScript code as a string.
         if error, returns error object,
-        if success, returns string containing the transpiled js.
-        and additional info
+        if success, returns object containing:
+          - string containing the transpiled js.
+          - and additional info
 
-        (may also take a xinfo object with additional meta-info)
+        (may also take an xinfo object with additional meta-info)
         */
         cache_ops = {
             from_cache: [],
@@ -641,15 +641,12 @@ maisonette_transpiler = (function() {
             out += line + "\n"
         }
 
-
         let f = first_line.line
             .replace("#", "")
             .replace("function", "") //sic. not: "function "
             .trim()
 
         let p = f.split(" ").map( n => n.trim()).filter(n => n)
-
-
 
         if (!p.length && !block_definitions[name_of_command].nameless_allowed) {
             return {
@@ -1132,7 +1129,7 @@ maisonette_transpiler = (function() {
         }
 
         let code = lines.map(n => n.line).join("\n")
-        code = preprocess_strings_and_comments(code)
+        code = preprocess_code(code)
         if (code.error) return code
         lines = code.split("\n")
 

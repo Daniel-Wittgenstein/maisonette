@@ -47,12 +47,12 @@ help_processor = (function() {
             let h = $(jq_el).html()
 
             h = h.replace(/\<code\>[\s\S]*?\<\/code\>/g, (n) => {
-                console.log(123, n)
+                //console.log(123, n)
                 n = n
                     .replace("<code>", "")
                     .replaceAll("&amp;#x5f;", "_")
                     .replace("</code>", "")
-                console.log(456, n)
+                //console.log(456, n)
                 return `<div class="code-box">${n}</div>`
             })
             jq_el.html(h)
