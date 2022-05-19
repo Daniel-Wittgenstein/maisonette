@@ -17,3 +17,5 @@ You can put entire pages of code inside a text file
 or just a few simple lines.
 
 The input is the MaisonetteCode, the output the JavaScript code, of course.
+
+The third test fails. That is a limitation of Esprima,plain and simple.

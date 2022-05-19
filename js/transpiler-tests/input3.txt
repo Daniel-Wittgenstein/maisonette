@@ -1,0 +1,12 @@
+
+#rule drink bottle
+  if ' !== === = ==  and ' = / and or and / and / and && / == ` and or `
+
+run:
+	x = x + 2
+
+
+
+
+
+

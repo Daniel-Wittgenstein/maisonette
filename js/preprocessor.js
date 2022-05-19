@@ -90,13 +90,14 @@ function preprocess_code(code) {
     let snip = code.substr(start, len) +
       "<span style='color: red'>" + code.substr(e.index, 1) + "</span>" +
       code.substr(e.index + 1, range)
+    console.log("esprima error", e)
     return {
       error: true,
       line_nr: e.lineNumber,
       msg: `I found an invalid character or an invalid combination of characters
       inside a code block. This could be an illegal character like an '@'.
-      It could also be legal characters like '+' or '-' but
-      combined in a way that does not make sense to me, for example: '++++--'.
+      \n
+      Esprima thinks this is the error: ${e.description}
       \n
       The problem probably
       happened at the highlighted character or near it:\n ${snip}`,

@@ -927,6 +927,10 @@ maisonette_transpiler = (function() {
             let cond = if_line.line
             cond = cond.trim().replace("if ", "")
             cond = process_if_condition(cond)
+            if (cond.error) {
+              return cond
+            }
+
             gather.if[0].line = cond
         }
         
@@ -1044,6 +1048,8 @@ maisonette_transpiler = (function() {
     function process_if_condition(n) {
       n = preprocess_code(n)
 
+      if (n.error) return n
+
       n = n
           .replaceAll("===", "=")
           .replaceAll("==", "=")
@@ -1088,7 +1094,10 @@ maisonette_transpiler = (function() {
                 let cond = parts[0]
                 let conseq = parts[1]
                 cond = process_if_condition(cond)
-                    
+                if (cond.error) {
+                  return cond
+                }
+    
                 if (parts.length === 1) {
                     return `if (${cond}) {`
                 } else {

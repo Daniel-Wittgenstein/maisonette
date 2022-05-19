@@ -47,7 +47,7 @@ window.my_test1 = (() => {
           )
 
           res2 = fs.readFileSync(
-            dir + "/output" + i + ".txt",
+            dir + "/output" + i + ".js",
             'utf-8'
           )
         } catch(e) {
