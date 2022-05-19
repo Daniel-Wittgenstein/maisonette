@@ -1042,14 +1042,20 @@ maisonette_transpiler = (function() {
 
 
     function process_if_condition(n) {
-        return n
-            .replaceAll("===", "=")
-            .replaceAll("==", "=")
-            .replace("=", "===")
-            .replaceAll("!===", "!==")
-            .replaceAll(">===", ">=")
-            .replaceAll(" and ", " && ")
-            .replaceAll(" or ", " || ")
+      n = preprocess_code(n)
+
+      n = n
+          .replaceAll("===", "=")
+          .replaceAll("==", "=")
+          .replaceAll("=", "===")
+          .replaceAll("!===", "!==")
+          .replaceAll(">===", ">=")
+          .replaceAll(" and ", " && ")
+          .replaceAll(" or ", " || ")
+
+      n = restore_strings(n)
+
+      return n
     }
 
     function transpile_code_block(lines) {

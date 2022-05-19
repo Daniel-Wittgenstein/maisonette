@@ -125,8 +125,6 @@ function preprocess_code(code) {
     code = replace_part(code, token.range[0], token.range[1], text)
   }
 
-  //console.log(code)
-
   return code
 
   //#############
