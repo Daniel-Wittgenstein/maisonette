@@ -1,6 +1,5 @@
 
 #rule drink bottle
-  if x = 7
 
 run:
 	x = x + 2

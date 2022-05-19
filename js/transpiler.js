@@ -1024,7 +1024,7 @@ maisonette_transpiler = (function() {
                 out += "\n"
             }
             out += instr[section_name].end
-            if (!last_section && section_name!=="empty_lines_at_start") out += ", "
+            if (!last_section && section_name!=="empty_lines_at_start") out += ","
         }
         out += "});"
 

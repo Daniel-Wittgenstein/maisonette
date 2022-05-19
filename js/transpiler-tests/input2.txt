@@ -1,0 +1,6 @@
+
+#rule drink bottle
+  if x = /=9/g and y == `==`
+
+run:
+	x = x + 2
