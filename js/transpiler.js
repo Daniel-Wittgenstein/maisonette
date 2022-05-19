@@ -75,7 +75,6 @@ These are all the valid block types.
 
 */
 
-
 maisonette_transpiler = (function() {
 
     let NAMESPACE = "m$"
@@ -101,7 +100,6 @@ maisonette_transpiler = (function() {
         "comment": "comment",
 
         "add": "add",
-
     }
 
     const block_definitions = {
@@ -292,6 +290,14 @@ maisonette_transpiler = (function() {
             .replace( /\r/g, "\n")
 
         let block_list = split_into_blocks(content, "#")
+        if (block_list.error) {
+          return {
+            error: true,
+            msg: block_list.msg,
+            line_nr: block_list.line_nr,
+          }
+        }
+        
         let out = ""
         //console.log("block list", block_list)
         let index = -1
@@ -369,6 +375,14 @@ maisonette_transpiler = (function() {
 
 
     function split_into_blocks(str, special_char = "#") {
+        function add_line(line, index) {
+          blocks[block_counter].push({
+            line: line,
+            line_nr: index + 1,
+          })
+        }
+
+
         /* splits string into blocks */
         let lines = str.split("\n")
         let blocks = []
@@ -377,14 +391,37 @@ maisonette_transpiler = (function() {
         let index = -1
         for (let line of lines) {
             index ++
-            if (line.trim().startsWith(special_char)) {
-                block_counter++
-                blocks[block_counter] = []
+            let trimmed_line = line.trim()
+            if (trimmed_line.startsWith(special_char)) {
+              let r = split_into_first_word_and_rest(trimmed_line)
+              if ( !word_to_keyword[ r[0].replace(special_char, "") ] ) {
+                if (line.startsWith(special_char)) {
+                  //if it's not a keyword, but is indented, we just
+                  //assume it's a private field and let it slide.
+                  //JS will throw a syntax error later if that's not the case.
+                  //if it's unindented, we return an error.
+                  return {
+                    error: true,
+                    msg: `'${r[0]}' is not a valid keyword.
+                      You probably just misspelled a Maisonette keyword.
+                      \n
+                      Alternatively you may be trying to use advanced JavaScript. If you are trying
+                      to write a JavaScript class with a private field,
+                      you should indent this line, so that it's clear to Maisonette
+                      this is a private field!                      
+                      `,
+                    line_nr: index,
+                  }
+                } else {
+                  add_line(line, index)
+                  continue
+                }
+              }
+              block_counter++
+              blocks[block_counter] = []
             }
-            blocks[block_counter].push({
-                line: line,
-                line_nr: index + 1,
-            })
+
+            add_line(line, index)
         }
         return blocks
     }

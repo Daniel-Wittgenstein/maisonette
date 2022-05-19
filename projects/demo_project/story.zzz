@@ -1,8 +1,10 @@
 
 
-#thing apple
+#thing ss
+	add: 2
 
-#function start
+
+    #function start
 
 
 	box("left")
@@ -61,3 +63,25 @@ You eat the sandwich. ((the Sandwich * sandwich))
 
 #rule drink sandwich
 You cannot drink the sandwich.
+
+run:
+
+	console.log(2)
+    class jasjs {
+		#rule
+   }
+  console.log(3)
+  console.log(6)
+  console.log(3)
+  console.log(6)
+  console.log(3)
+  console.log(6)
+  console.log(3)
+
+  console.log(3)
+  console.log(6)
+  
+  
+  
+  
+
