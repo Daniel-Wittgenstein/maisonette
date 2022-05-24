@@ -1,6 +1,4 @@
-
-
-
+#rule take me
 #rule drink bottle
   if x = 7
 

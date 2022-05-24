@@ -888,6 +888,7 @@ function init_code_editor() {
         mode:  "simplemode",
         theme: "msnnight",
         lineNumbers: true,
+        lineWrapping: true,
     })
 
     cm.setSize("100%", "100%") //only works like this, not via css file
@@ -1015,15 +1016,15 @@ function init_editor_shower() {
     $("#show-editor").on("change", () => {
         let val = $("#show-editor").val()
         if (val === "only-editor") {
-            show_editor()
+          show_editor()
         } else if (val === "only-play") {
             hide_editor()
         } else if (val === "editor-play") {
-            show_editor()
-            $(".main-box").css("flex-direction", "row")
+          show_editor()
+          $(".main-box").css("flex-direction", "row")
         } else if (val === "play-editor") {
-            show_editor()
-            $(".main-box").css("flex-direction", "row-reverse")
+          show_editor()
+          $(".main-box").css("flex-direction", "row-reverse")
         }
     })
 }
