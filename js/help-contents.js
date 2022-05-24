@@ -1067,12 +1067,13 @@ parameters:
 
 2. parameter: A valid color code string for colors, otherwise
 a value like "4px" or similar. Colors can be HTML color names, or they
-can be written in rgb, rgba or hex notation (just like CSS).
-Note the American spelling (writing "colour" is not allowed).
+can be written in rgb, rgba or hex notation (just like in CSS).
 
 These are all valid option strings:
 
 - "main background color": Sets the main background color.
+(The spelling "color" is preferrable, because it is compatible
+with CSS, but "colour" is also allowed, here.)
 
 - "main foreground color": Sets the main foreground color.
 
@@ -1111,6 +1112,12 @@ select verbs.
 
 - "verb selector border radius": Use a value like "4px" to make the edges
 round, "0px" to make them normal (rectangular).
+
+- "hamburger color": Sets the color of the hamburger icon (the menu icon in the top bar).
+Since the icon uses an SVG image, you cannot use any color here. Instead you have the following
+options for the second parameter:
+  "white", "almost-white", "light-gray", "gray", "dark-gray", "almost-black" or "black".
+
 
 Note: Changing colors during the game should be okay, but hasn't been thoroughly
 tested, yet.
@@ -1297,7 +1304,7 @@ parameters:
 1. new size of the root font. Use "rem" units.
 
 Note: The default root font size set by styler is "0.875rem", which should translate
-to "14px" on most browsers. If, for example, if you
+to "14px" on most browsers. If, for example, you
 call 'styler.set_root_font_size("1.0rem")' the font size will go up to 16 pixels.
 
 Note: This should only be called once at the beginning of the game

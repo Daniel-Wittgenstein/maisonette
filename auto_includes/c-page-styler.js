@@ -59,10 +59,42 @@ let styler = (() => {
         return a
     }
 
+
+    function set_hamburger_style(n) {
+        let col, hov
+        if (n === "white") {
+          col = 0; hov = 100
+        } else if (n === "black") {
+          col = 100; hov = 0
+        } else if (n === "almost-white") {
+          col = 10; hov = 90
+        } else if (n === "almost-black") {
+          col = 90; hov = 10
+        } else if (n === "gray" || n === "grey") {
+          col = 50; hov = 20
+        } else if (n === "light-gray" || n === "light-grey") {
+          col = 25; hov = 75
+        } else if (n === "dark-gray" || n === "dark-grey") {
+          col = 75; hov = 25
+        }
+        set_css_var("hamburger-invert", col + "%")
+        set_css_var("hamburger-invert-hover", hov + "%")    
+    }
+
     let scroll_bar_style_set = false
 
     let funcs = {
         set: (prop, c) => {
+
+            if (!isString(prop)) {
+              return {
+                error: true,
+                msg: `You should pass a string to styler.set!`,
+              }
+            }
+
+            prop = prop.trim().toLowerCase().replace("colour", "color")
+console.log(9, prop)
             let lookup = {
                 //colors:
                 "main background color": "main-bg",
@@ -82,16 +114,21 @@ let styler = (() => {
                 "verb selector hover background color": "verb-selector-hover-bg",
                 "verb selector hover foreground color": "verb-selector-hover-fg",
                 "verb selector border color": "verb-selector-border-col",
-
                 //non-colors:
                 "verb selector border radius": "verb-selector-border-radius",
         
             }
+            if (prop === "hamburger color") {
+                set_hamburger_style(c)
+                return
+            }
+
             if (!lookup[prop]) return {
                 error: true,
                 msg: `style: I don't know this option: '${prop}'`,
             }
-            set_css_var(lookup[prop], c)
+            let css_var = lookup[prop]
+            set_css_var(css_var, c)
             return true
         },
 

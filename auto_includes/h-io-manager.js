@@ -186,7 +186,7 @@ const stop = "stop"
         world_manager.log_load_info()
 
         stream_manager.create_stream("main", ".center-bottom")
-        stream_manager.create_stream("top", ".box-top")
+        //stream_manager.create_stream("top", ".box-top")
         stream_manager.create_stream("bottom", ".box-bottom")
         stream_manager.create_stream("left", ".box-left")
         stream_manager.create_stream("main-top", ".center-top")

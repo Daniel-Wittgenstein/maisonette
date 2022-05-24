@@ -57,6 +57,10 @@ commane*/
 	styler.set("thing button foreground color hover", "white")
 	styler.set("thing button background color", "red")
 
+
+	styler.set("Hamburger colour", "black")
+
+
     styler.set("verb selector hover background color", "red")
     styler.set("verb selector hover foreground color", "yellow")
 
@@ -67,7 +71,7 @@ commane*/
     styler.set("verb selector hover foreground color", "yellow")
 
     styler.set("verb selector border radius", "4px")
-    styler.set("verb selector border color", "green")
+    styler.set("verb selector border color", "yellow")
 
 
 

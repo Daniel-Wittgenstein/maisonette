@@ -38,6 +38,9 @@
     --verb-selector-hover-bg: #FFF;
     --verb-selector-hover-fg: #000;
 
+    --hamburger-invert: 0%;
+    --hamburger-invert-hover: 100%;
+
     font-size: 0.875rem; /* not a variable! does not start with -- */
 }
 
@@ -143,7 +146,21 @@ body {
     max-height: 45vh;
     overflow: hidden;
     border-bottom: 1px var(--border-color) solid;
+    text-align: left;
 }
+
+#hamburger {
+  background: rgba(0,0,0,0);
+  cursor: pointer;
+  filter: invert(var(--hamburger-invert));
+  width: 32px;
+  height: 32px;
+}
+
+#hamburger:hover {
+  filter: invert(var(--hamburger-invert-hover));
+}
+
 
 .box-bottom { 
     grid-area: box-bottom;
@@ -179,8 +196,11 @@ body {
     line-height: 1.5rem;
     max-height: 4rem;
     overflow: hidden;
-    text-align: center;
     color: white;
+}
+
+.box-bottom {
+  text-align: center;
 }
 
 .box-top {
@@ -251,6 +271,8 @@ body {
     width: 100%;
     height: auto;
 }
+
+
 
 /*.box-right-text-box {
 }
